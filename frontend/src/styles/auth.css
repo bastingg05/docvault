@@ -1,12 +1,30 @@
-/* Modern Authentication Theme */
+/* Modern Authentication Theme - Full Screen */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .auth-container {
   min-height: 100vh;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 0;
+  margin: 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   overflow: hidden;
 }
 
@@ -39,6 +57,7 @@
   z-index: 2;
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: all 0.3s ease;
+  margin: 20px;
 }
 
 .auth-form:hover {
@@ -208,6 +227,7 @@
   .auth-form {
     padding: 30px 24px;
     margin: 20px;
+    max-width: calc(100vw - 40px);
   }
   
   .auth-title {
