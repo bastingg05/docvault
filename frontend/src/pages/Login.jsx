@@ -1,15 +1,20 @@
 import React, { useState } from "react";
 import { loginUser } from "../services/userService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import "../styles/auth.css";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    
     try {
       const user = await loginUser(email, password);
       console.log("Logged in:", user);
@@ -20,88 +25,54 @@ function Login() {
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || err.message || "Invalid credentials");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "80vh",
-      padding: "20px"
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        width: "100%",
-        maxWidth: "400px",
-        padding: "30px",
-        background: "white",
-        borderRadius: "10px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "20px"
-      }}>
-        <h2 style={{ 
-          textAlign: "center", 
-          margin: "0 0 20px 0",
-          color: "#333",
-          fontSize: "24px"
-        }}>Login</h2>
+    <div className="auth-container">
+      <form onSubmit={handleSubmit} className="auth-form">
+        <h2 className="auth-title">Welcome Back</h2>
+        <p className="auth-subtitle">Sign in to your DocuVault account</p>
         
-        {error && <p style={{ 
-          color: "red", 
-          textAlign: "center", 
-          margin: "0",
-          fontSize: "14px"
-        }}>{error}</p>}
+        {error && <p className="auth-error">{error}</p>}
         
-        <div>
+        <div className="auth-input-group">
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
+            className="auth-input"
             required
+            disabled={isLoading}
           />
         </div>
         
-        <div>
+        <div className="auth-input-group">
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
+            className="auth-input"
             required
+            disabled={isLoading}
           />
         </div>
         
-        <button type="submit" style={{
-          padding: "12px",
-          backgroundColor: "#007bff",
-          color: "white",
-          border: "none",
-          borderRadius: "5px",
-          fontSize: "16px",
-          cursor: "pointer",
-          fontWeight: "bold"
-        }}>Login</button>
+        <button 
+          type="submit" 
+          className={`auth-button ${isLoading ? 'loading' : ''}`}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Signing In...' : 'Sign In'}
+        </button>
+        
+        <p className="auth-link">
+          Don't have an account? <Link to="/register">Sign up here</Link>
+        </p>
       </form>
     </div>
   );
