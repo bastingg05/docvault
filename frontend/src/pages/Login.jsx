@@ -32,6 +32,12 @@ function Login() {
 
   return (
     <div className="auth-container">
+      <div className="auth-back-home">
+        <Link to="/" className="auth-home-link">
+          ← Back to Home
+        </Link>
+      </div>
+      
       <form onSubmit={handleSubmit} className="auth-form">
         <h2 className="auth-title">Welcome Back</h2>
         <p className="auth-subtitle">Sign in to your DocuVault account</p>

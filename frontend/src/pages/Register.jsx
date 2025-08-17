@@ -33,6 +33,12 @@ function Register() {
 
   return (
     <div className="auth-container">
+      <div className="auth-back-home">
+        <Link to="/" className="auth-home-link">
+          ← Back to Home
+        </Link>
+      </div>
+      
       <form onSubmit={handleSubmit} className="auth-form">
         <h2 className="auth-title">Create Account</h2>
         <p className="auth-subtitle">Join DocuVault and start managing your documents</p>
@@ -69,8 +75,8 @@ function Register() {
             placeholder="Create password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="auth-input"
             required
+            className="auth-input"
             disabled={isLoading}
           />
         </div>
