@@ -118,6 +118,26 @@ app.post("/api/documents", (req, res) => {
   });
 });
 
+// Mock document delete endpoint
+app.delete("/api/documents/:id", (req, res) => {
+  const documentId = req.params.id;
+  
+  // Find the document index
+  const documentIndex = mockDocuments.findIndex(doc => (doc.id || doc._id) == documentId);
+  
+  if (documentIndex === -1) {
+    return res.status(404).json({ message: 'Document not found' });
+  }
+  
+  // Remove the document
+  const deletedDocument = mockDocuments.splice(documentIndex, 1)[0];
+  
+  res.status(200).json({
+    message: 'Document deleted successfully',
+    document: deletedDocument
+  });
+});
+
 // Root endpoint
 app.get("/", (req, res) => {
   res.json({ message: "DocuVault Mock API Server", endpoints: ["/health", "/api/users/login", "/api/documents"] });
