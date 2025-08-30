@@ -1,13 +1,16 @@
 services:
   - type: web
-    name: docuvault-backend
+    name: docvault-backend
     env: node
-    buildCommand: npm install
-    startCommand: npm start
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && node server.js
     envVars:
       - key: NODE_ENV
         value: production
+      - key: MONGO_URI
+        value: mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0
       - key: JWT_SECRET
-        value: "your-secret-key-here"
+        value: your-super-secret-jwt-key-change-this-in-production
     healthCheckPath: /health
     autoDeploy: true

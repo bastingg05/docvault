@@ -11,6 +11,8 @@ dotenv.config();
 console.log("🚀 Starting DocuVault server...");
 console.log("Environment:", process.env.NODE_ENV);
 console.log("MongoDB URI exists:", !!process.env.MONGO_URI);
+console.log("MongoDB URI length:", process.env.MONGO_URI ? process.env.MONGO_URI.length : 0);
+console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
 
 // Connect to MongoDB - Updated for Render deployment
 let dbConnected = false;
