@@ -239,14 +239,16 @@ function App() {
           </Routes>
         </div>
 
-        {/* Health Dashboard - Fixed position at bottom right */}
+        {/* Health Dashboard - Fixed position at right side, properly aligned and lowered */}
         {showHealthDashboard && (
           <div style={{
             position: 'fixed',
-            bottom: '20px',
-            right: '20px',
+            top: '100px', // Lowered down from top
+            right: '0px', // Properly right-aligned
             zIndex: 1000,
-            maxWidth: '400px'
+            width: '380px',
+            height: 'calc(100vh - 120px)', // Full height minus top margin
+            overflowY: 'auto'
           }}>
             <HealthDashboard onClose={() => setShowHealthDashboard(false)} />
           </div>
