@@ -358,3 +358,194 @@ body, html {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Connection Status Styles */
+.connection-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.status-connected {
+  background: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.3);
+  color: #2f855a;
+}
+
+.status-disconnected {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+  color: #c53030;
+}
+
+.status-checking {
+  background: rgba(237, 137, 54, 0.1);
+  border: 1px solid rgba(237, 137, 54, 0.3);
+  color: #c05621;
+}
+
+.status-error {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+  color: #c53030;
+}
+
+.status-unknown {
+  background: rgba(113, 128, 150, 0.1);
+  border: 1px solid rgba(113, 128, 150, 0.3);
+  color: #4a5568;
+}
+
+.status-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.retry-connection-btn {
+  background: rgba(245, 101, 101, 0.9);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.retry-connection-btn:hover {
+  background: rgba(245, 101, 101, 1);
+  transform: translateY(-1px);
+}
+
+/* Enhanced Error Display */
+.auth-error {
+  background: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #c53030;
+}
+
+.error-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.error-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.retry-count {
+  font-size: 12px;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Network Troubleshooting Tips */
+.network-tips {
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.network-tips h4 {
+  color: #4a5568;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.network-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.network-tips li {
+  color: #718096;
+  font-size: 13px;
+  padding: 4px 0;
+  position: relative;
+  padding-left: 20px;
+}
+
+.network-tips li:before {
+  content: "💡";
+  position: absolute;
+  left: 0;
+  font-size: 12px;
+}
+
+/* Disabled state styling */
+.auth-input:disabled,
+.auth-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-input:disabled {
+  background: rgba(113, 128, 150, 0.1);
+}
+
+.auth-button:disabled {
+  background: rgba(113, 128, 150, 0.5);
+}
+
+/* Loading state enhancements */
+.auth-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.auth-button.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .connection-status {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+  
+  .auth-error {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .network-tips {
+    margin-top: 16px;
+    padding: 12px;
+  }
+}
