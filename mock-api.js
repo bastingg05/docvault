@@ -10,13 +10,10 @@ app.use(express.json());
 
 // Mock data
 const mockUsers = [
-  { id: 1, email: 'bastin123@gmail.com', password: 'test123' }
+  { id: 1, name: "Bastin", email: "bastin123@gmail.com", password: "test123" }
 ];
 
-const mockDocuments = [
-  { id: 1, title: 'Sample Document 1', description: 'This is a sample document', uploadDate: new Date().toISOString(), size: '1.2 MB' },
-  { id: 2, title: 'Sample Document 2', description: 'Another sample document', uploadDate: new Date().toISOString(), size: '856 KB' }
-];
+const mockDocuments = [];
 
 // Health check endpoint
 app.get("/health", (req, res) => {
@@ -149,5 +146,6 @@ app.listen(PORT, () => {
   console.log(`Mock API Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`Login: POST http://localhost:${PORT}/api/users/login`);
-  console.log(`Documents: GET/POST http://localhost:${PORT}/api/documents`);
+  console.log(`Register: POST http://localhost:${PORT}/api/users/register`);
+  console.log(`Documents: GET/POST/DELETE http://localhost:${PORT}/api/documents`);
 });

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { getDocuments, deleteDocument } from "../services/documentService";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getDocuments, deleteDocument } from '../services/documentService';
 
-function Documents() {
+const Documents = () => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,190 +13,168 @@ function Documents() {
 
   const fetchDocuments = async () => {
     try {
-      const data = await getDocuments();
-      setDocuments(data);
-      setError("");
-    } catch (err) {
-      console.error("Fetch documents error:", err);
-      setError(err.response?.data?.message || err.message || "Failed to fetch documents");
+      const docs = await getDocuments();
+      setDocuments(docs);
+    } catch (error) {
+      console.error('Error fetching documents:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (documentId) => {
-    if (window.confirm("Are you sure you want to delete this document?")) {
+    if (window.confirm('Are you sure you want to delete this document?')) {
       try {
         await deleteDocument(documentId);
-        setDocuments(documents.filter(doc => doc._id !== documentId));
-      } catch (err) {
-        console.error("Delete document error:", err);
-        setError(err.response?.data?.message || err.message || "Failed to delete document");
+        setDocuments(documents.filter(doc => (doc._id || doc.id) !== documentId));
+      } catch (error) {
+        console.error('Error deleting document:', error);
       }
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "No expiry date";
-    return new Date(dateString).toLocaleDateString();
+  const handleAddDocument = () => {
+    navigate('/add-document');
   };
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "20px" }}>Loading documents...</div>;
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
   }
 
   return (
-    <div style={{ 
-      maxWidth: "1200px", 
-      margin: "0 auto", 
-      padding: "20px",
-      minHeight: "80vh"
-    }}>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ 
-        display: "flex", 
-        flexDirection: window.innerWidth <= 768 ? "column" : "row",
-        justifyContent: "space-between", 
-        alignItems: window.innerWidth <= 768 ? "stretch" : "center", 
-        marginBottom: "30px",
-        gap: "15px"
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '30px',
+        padding: '20px',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        borderRadius: '15px',
+        color: 'white'
       }}>
-        <h2 style={{
-          margin: "0",
-          color: "#333",
-          fontSize: "28px"
-        }}>My Documents</h2>
-        <button 
-          onClick={() => navigate("/add-document")}
-          style={{ 
-            padding: "12px 24px", 
-            backgroundColor: "#28a745", 
-            color: "white", 
-            border: "none", 
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "bold"
+        <h1>My Documents</h1>
+        <button
+          onClick={handleAddDocument}
+          style={{
+            background: 'rgba(255,255,255,0.2)',
+            color: 'white',
+            border: '2px solid rgba(255,255,255,0.3)',
+            padding: '12px 24px',
+            borderRadius: '25px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500',
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(255,255,255,0.3)';
+            e.target.style.transform = 'translateY(-2px)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(255,255,255,0.2)';
+            e.target.style.transform = 'translateY(0)';
           }}
         >
-          Add New Document
+          ➕ Add Document
         </button>
       </div>
 
-      {error && <p style={{ 
-        color: "red", 
-        textAlign: "center",
-        padding: "10px",
-        background: "#ffe6e6",
-        borderRadius: "5px",
-        margin: "0 0 20px 0"
-      }}>{error}</p>}
-
       {documents.length === 0 ? (
-        <div style={{ 
-          textAlign: "center", 
-          padding: "60px 20px",
-          background: "white",
-          borderRadius: "10px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+        <div style={{
+          textAlign: 'center',
+          padding: '60px 20px',
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '15px',
+          border: '2px dashed rgba(255,255,255,0.2)'
         }}>
-          <p style={{
-            fontSize: "18px",
-            color: "#666",
-            margin: "0 0 20px 0"
-          }}>No documents found. Add your first document!</p>
-          <button 
-            onClick={() => navigate("/add-document")}
-            style={{ 
-              padding: "12px 24px", 
-              backgroundColor: "#007bff", 
-              color: "white", 
-              border: "none", 
-              borderRadius: "5px",
-              cursor: "pointer",
-              fontSize: "16px",
-              fontWeight: "bold"
+          <div style={{ fontSize: '4rem', marginBottom: '20px' }}>📁</div>
+          <h3 style={{ marginBottom: '15px', color: '#666' }}>No Documents Yet</h3>
+          <p style={{ color: '#888', marginBottom: '30px' }}>
+            Start by adding your first document to get organized
+          </p>
+          <button
+            onClick={handleAddDocument}
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none',
+              padding: '15px 30px',
+              borderRadius: '25px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = 'none';
             }}
           >
-            Add Document
+            Add Your First Document
           </button>
         </div>
       ) : (
-        <div style={{ 
-          display: "grid", 
-          gap: "20px",
-          gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "repeat(auto-fill, minmax(350px, 1fr))"
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: '20px'
         }}>
           {documents.map((doc) => (
-            <div 
-              key={doc._id || doc.id} 
-              style={{ 
-                border: "1px solid #ddd", 
-                borderRadius: "10px", 
-                padding: "20px",
-                backgroundColor: "white",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                transition: "transform 0.2s ease"
+            <div
+              key={doc._id || doc.id}
+              style={{
+                background: 'white',
+                borderRadius: '15px',
+                padding: '20px',
+                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease',
+                border: '1px solid #eee'
               }}
-              onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-              onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-5px)';
+                e.target.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+              }}
             >
-              <div style={{ 
-                display: "flex", 
-                flexDirection: window.innerWidth <= 768 ? "column" : "row",
-                justifyContent: "space-between", 
-                alignItems: window.innerWidth <= 768 ? "stretch" : "flex-start",
-                gap: "15px"
-              }}>
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ 
-                    margin: "0 0 15px 0",
-                    color: "#333",
-                    fontSize: "20px"
-                  }}>{doc.title}</h3>
-                  <div style={{ marginBottom: "8px" }}>
-                    <span style={{ fontWeight: "bold", color: "#333" }}>Category:</span>
-                    <span style={{ color: "#666", marginLeft: "5px" }}>{doc.category || 'General'}</span>
-                  </div>
-                  <div style={{ marginBottom: "8px" }}>
-                    <span style={{ fontWeight: "bold", color: "#333" }}>Expiry Date:</span>
-                    <span style={{ color: "#666", marginLeft: "5px" }}>{formatDate(doc.expiryDate)}</span>
-                  </div>
-                  <div style={{ marginBottom: "15px" }}>
-                    <span style={{ fontWeight: "bold", color: "#333" }}>Added:</span>
-                    <span style={{ color: "#666", marginLeft: "5px" }}>{new Date(doc.uploadDate || doc.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  {doc.fileUrl && (
-                    <a 
-                      href={doc.fileUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        color: "#007bff", 
-                        textDecoration: "none",
-                        display: "inline-block",
-                        padding: "8px 16px",
-                        border: "1px solid #007bff",
-                        borderRadius: "5px",
-                        fontSize: "14px",
-                        fontWeight: "bold"
-                      }}
-                    >
-                      View Document →
-                    </a>
-                  )}
-                </div>
-                <button 
+              <div style={{ marginBottom: '15px' }}>
+                <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{doc.title}</h3>
+                <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>{doc.description}</p>
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <span style={{ color: "#666", marginLeft: "5px" }}>{doc.category || 'General'}</span>
+                <span style={{ color: "#666", marginLeft: "5px" }}>{new Date(doc.uploadDate || doc.createdAt).toLocaleDateString()}</span>
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ color: '#888', fontSize: '14px' }}>{doc.size}</span>
+                <button
                   onClick={() => handleDelete(doc._id || doc.id)}
-                  style={{ 
-                    padding: "8px 16px", 
-                    backgroundColor: "#dc3545", 
-                    color: "white", 
-                    border: "none", 
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                    alignSelf: window.innerWidth <= 768 ? "stretch" : "flex-start"
+                  style={{
+                    background: '#ff6b6b',
+                    color: 'white',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '20px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = '#ff5252';
+                    e.target.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = '#ff6b6b';
+                    e.target.style.transform = 'scale(1)';
                   }}
                 >
                   Delete
@@ -209,6 +186,6 @@ function Documents() {
       )}
     </div>
   );
-}
+};
 
 export default Documents; 
