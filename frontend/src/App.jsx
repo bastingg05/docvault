@@ -172,16 +172,59 @@ function App() {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
     
-    // Register service worker for PWA capabilities
+    // Enhanced service worker registration for PWA capabilities
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered successfully:', registration);
+          console.log('✅ Service Worker registered successfully:', registration);
+          
+          // Check for updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('🔄 New service worker available');
+                // Optionally show update notification to user
+                if (confirm('A new version of DocuVault is available. Would you like to update?')) {
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  window.location.reload();
+                }
+              }
+            });
+          });
+          
+          // Handle service worker messages
+          navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data.type === 'ONLINE_STATUS_CHANGED') {
+              console.log('🌐 Online status changed:', event.data.online);
+              // You can update UI here if needed
+            }
+          });
         })
         .catch((error) => {
-          console.error('Service Worker registration failed:', error);
+          console.error('❌ Service Worker registration failed:', error);
         });
     }
+    
+    // Network status monitoring
+    const handleOnline = () => {
+      console.log('🌐 Network connection restored');
+      // Optionally refresh data or show online status
+    };
+    
+    const handleOffline = () => {
+      console.log('📡 Network connection lost');
+      // Optionally show offline status or cached content
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Listen for login state changes

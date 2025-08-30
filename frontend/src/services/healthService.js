@@ -1,14 +1,18 @@
 class HealthService {
   constructor() {
     this.healthCheckInterval = 30000; // 30 seconds
-    this.uptimeStart = Date.now();
-    this.healthChecks = [];
-    this.isOnline = navigator.onLine;
-    this.connectionQuality = 'good';
-    this.lastHealthCheck = null;
-    this.healthStatus = 'healthy';
-    
-    this.init();
+    this.retryAttempts = 3;
+    this.retryDelay = 5000; // 5 seconds
+    this.offlineMode = false;
+    this.lastSuccessfulCheck = Date.now();
+    this.connectionRetryTimer = null;
+    this.offlineFallbackData = {
+      status: 'offline',
+      isOnline: false,
+      connectionQuality: 'poor',
+      lastHealthCheck: Date.now(),
+      uptime: 0
+    };
   }
 
   init() {
@@ -67,76 +71,161 @@ class HealthService {
     }
   }
 
+  // Enhanced health check with retry logic and offline detection
+  async performHealthCheck() {
+    let attempts = 0;
+    
+    while (attempts < this.retryAttempts) {
+      try {
+        const startTime = Date.now();
+        
+        // Check if we're online first
+        if (!navigator.onLine) {
+          this.setOfflineMode();
+          return;
+        }
+        
+        // Check backend health with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+        
+        const healthResponse = await fetch('https://docvault-1.onrender.com/health', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        const responseTime = Date.now() - startTime;
+        
+        if (healthResponse.ok) {
+          const healthData = await healthResponse.json();
+          this.updateHealthMetrics(healthData, responseTime);
+          this.healthStatus = 'healthy';
+          this.setOnlineMode();
+          this.lastSuccessfulCheck = Date.now();
+          return; // Success, exit retry loop
+        } else {
+          this.healthStatus = 'degraded';
+          this.logHealthIssue('Backend health check failed', responseTime);
+        }
+      } catch (error) {
+        attempts++;
+        this.logHealthIssue(`Health check attempt ${attempts} failed`, null, error);
+        
+        if (error.name === 'AbortError') {
+          console.warn('Health check timed out, retrying...');
+        } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          this.setOfflineMode();
+          return; // Don't retry network errors
+        }
+        
+        if (attempts < this.retryAttempts) {
+          await this.delay(this.retryDelay);
+        }
+      }
+    }
+    
+    // All retries failed
+    this.healthStatus = 'unhealthy';
+    this.setOfflineMode();
+  }
+
+  // Set offline mode and use fallback data
+  setOfflineMode() {
+    this.offlineMode = true;
+    this.healthStatus = 'offline';
+    this.isOnline = false;
+    this.connectionQuality = 'poor';
+    
+    // Schedule retry when connection is restored
+    if (this.connectionRetryTimer) {
+      clearTimeout(this.connectionRetryTimer);
+    }
+    
+    this.connectionRetryTimer = setTimeout(() => {
+      this.attemptReconnection();
+    }, 30000); // Try to reconnect every 30 seconds
+    
+    // Dispatch offline event
+    window.dispatchEvent(new CustomEvent('healthStatusChanged', {
+      detail: this.offlineFallbackData
+    }));
+  }
+
+  // Set online mode and restore normal operation
+  setOnlineMode() {
+    this.offlineMode = false;
+    this.isOnline = true;
+    
+    if (this.connectionRetryTimer) {
+      clearTimeout(this.connectionRetryTimer);
+      this.connectionRetryTimer = null;
+    }
+  }
+
+  // Attempt to reconnect when connection is restored
+  async attemptReconnection() {
+    if (navigator.onLine && this.offlineMode) {
+      console.log('🔄 Attempting to reconnect...');
+      await this.performHealthCheck();
+    }
+  }
+
+  // Enhanced start monitoring with connection event listeners
   startHealthMonitoring() {
-    // Initial health check
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      console.log('🌐 Network connection restored');
+      this.attemptReconnection();
+    });
+    
+    window.addEventListener('offline', () => {
+      console.log('📡 Network connection lost');
+      this.setOfflineMode();
+    });
+    
+    // Start health checks
     this.performHealthCheck();
     
     // Set up periodic health checks
     setInterval(() => {
-      this.performHealthCheck();
+      if (!this.offlineMode) {
+        this.performHealthCheck();
+      }
     }, this.healthCheckInterval);
-
+    
     // Set up heartbeat
     setInterval(() => {
-      this.sendHeartbeat();
-    }, 60000); // Every minute
-  }
-
-  async performHealthCheck() {
-    try {
-      const startTime = Date.now();
-      
-      // Check backend health - use the correct endpoint
-      const healthResponse = await fetch('https://docvault-1.onrender.com/health', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const responseTime = Date.now() - startTime;
-      
-      if (healthResponse.ok) {
-        const healthData = await healthResponse.json();
-        this.updateHealthMetrics(healthData, responseTime);
-        this.healthStatus = 'healthy';
-      } else {
-        this.healthStatus = 'degraded';
-        this.logHealthIssue('Backend health check failed', responseTime);
+      if (!this.offlineMode) {
+        this.sendHeartbeat();
       }
-    } catch (error) {
-      this.healthStatus = 'unhealthy';
-      this.logHealthIssue('Health check error', null, error);
-    }
-
-    this.lastHealthCheck = Date.now();
-    this.updateHealthStatus();
+    }, 60000); // Every minute
   }
 
   updateHealthMetrics(healthData, responseTime) {
     const healthCheck = {
       timestamp: Date.now(),
-      status: healthData.status,
-      responseTime,
-      uptime: healthData.uptime,
-      database: healthData.database,
-      memory: healthData.memory,
-      errorRate: healthData.performance?.errorRate || 0
+      status: this.healthStatus,
+      responseTime: responseTime,
+      data: healthData
     };
-
-    this.healthChecks.push(healthCheck);
     
-    // Keep only last 100 health checks
-    if (this.healthChecks.length > 100) {
-      this.healthChecks.shift();
+    this.healthHistory.push(healthCheck);
+    
+    // Keep only last 50 entries
+    if (this.healthHistory.length > 50) {
+      this.healthHistory.shift();
     }
-
+    
     // Update connection quality based on response time
-    if (responseTime < 100) {
+    if (responseTime < 300) {
       this.connectionQuality = 'excellent';
-    } else if (responseTime < 300) {
-      this.connectionQuality = 'good';
     } else if (responseTime < 1000) {
+      this.connectionQuality = 'good';
+    } else if (responseTime < 3000) {
       this.connectionQuality = 'fair';
     } else {
       this.connectionQuality = 'poor';
@@ -152,49 +241,50 @@ class HealthService {
 
     // Dispatch custom event for other components
     window.dispatchEvent(new CustomEvent('healthStatusChanged', {
-      detail: {
-        status: this.healthStatus,
-        isOnline: this.isOnline,
-        connectionQuality: this.connectionQuality,
-        lastHealthCheck: this.lastHealthCheck
-      }
+      detail: this.getHealthStatus()
     }));
   }
 
+  // Enhanced heartbeat with retry logic
   async sendHeartbeat() {
     try {
-      await fetch('https://docvault-1.onrender.com/health', {
-        method: 'GET',
+      const response = await fetch('https://docvault-1.onrender.com/api/heartbeat', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({
+          timestamp: Date.now(),
+          client: 'frontend',
+          version: '1.0.0'
+        })
       });
+      
+      if (response.ok) {
+        console.log('💓 Heartbeat sent successfully');
+      }
     } catch (error) {
-      console.log('Heartbeat failed:', error);
+      console.warn('💓 Heartbeat failed:', error.message);
     }
   }
 
-  logHealthIssue(message, responseTime, error = null) {
+  logHealthIssue(message, responseTime, error) {
     const issue = {
       timestamp: Date.now(),
-      message,
-      responseTime,
-      error: error?.message || null,
-      stack: error?.stack || null
+      message: message,
+      responseTime: responseTime,
+      error: error ? error.message : null
     };
-
-    console.warn('Health Issue:', issue);
     
-    // Store in localStorage for debugging
-    const issues = JSON.parse(localStorage.getItem('healthIssues') || '[]');
-    issues.push(issue);
+    console.warn('⚠️ Health Issue:', issue);
     
-    // Keep only last 50 issues
-    if (issues.length > 50) {
-      issues.shift();
-    }
-    
-    localStorage.setItem('healthIssues', JSON.stringify(issues));
+    // Store in health history
+    this.healthHistory.push({
+      timestamp: Date.now(),
+      status: 'error',
+      responseTime: responseTime || 0,
+      error: message
+    });
   }
 
   logHealthMetrics() {
@@ -298,20 +388,25 @@ class HealthService {
 
   // Public methods for other components
   getHealthStatus() {
+    if (this.offlineMode) {
+      return this.offlineFallbackData;
+    }
+    
     return {
-      status: this.healthStatus,
-      isOnline: this.isOnline,
-      connectionQuality: this.connectionQuality,
-      lastHealthCheck: this.lastHealthCheck,
-      uptime: Date.now() - this.uptimeStart
+      status: this.healthStatus || 'unknown',
+      isOnline: this.isOnline !== undefined ? this.isOnline : navigator.onLine,
+      connectionQuality: this.connectionQuality || 'unknown',
+      lastHealthCheck: this.lastHealthCheck || Date.now(),
+      uptime: this.uptime || 0
     };
   }
 
   getHealthHistory() {
-    return this.healthChecks;
+    return this.healthHistory || [];
   }
 
   forceHealthCheck() {
+    console.log('🔄 Forcing health check...');
     this.performHealthCheck();
   }
 
@@ -320,9 +415,13 @@ class HealthService {
     this.logHealthMetrics();
     // Clear intervals if needed
   }
+
+  // Utility method for delays
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 }
 
-// Create singleton instance
+// Create and export singleton instance
 const healthService = new HealthService();
-
 export default healthService;
