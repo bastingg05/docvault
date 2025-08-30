@@ -8,7 +8,7 @@ import documentRoutes from "./routes/documentRoutes.js";
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to MongoDB - Updated for Render deployment
 let dbConnected = false;
 connectDB().then(connected => {
   dbConnected = connected;
