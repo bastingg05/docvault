@@ -4,7 +4,7 @@ import { NETWORK_CONFIG } from './config/networkConfig.js';
 
 // Create axios instance with enhanced configuration
 const api = axios.create({
-  baseURL: 'https://docvault-1.onrender.com', // Use your deployed backend
+  baseURL: 'https://docuvault-backend.vercel.app', // Use Vercel backend
   timeout: NETWORK_CONFIG.TIMEOUTS.API_REQUEST,
   headers: {
     'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ function shouldRetry(error) {
 
 // Calculate retry delay with exponential backoff
 function calculateRetryDelay(attempt) {
-  const delay = NETWORK_CONFIG.RETRY.BASE_DELAY * Math.pow(NETWORK_CONFIG.RETRY.BACKOFF_MULTIPLIER, attempt - 1);
+  const delay = NETWORK_CONFIG.TIMEOUTS.BASE_DELAY * Math.pow(NETWORK_CONFIG.RETRY.BACKOFF_MULTIPLIER, attempt - 1);
   return Math.min(delay, NETWORK_CONFIG.RETRY.MAX_DELAY);
 }
 
