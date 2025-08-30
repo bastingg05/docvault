@@ -18,10 +18,20 @@ function Login() {
     try {
       const user = await loginUser(email, password);
       console.log("Logged in:", user);
+      
+      // Store token in localStorage
+      if (user.token) {
+        localStorage.setItem("token", user.token);
+      }
+      
       // Dispatch custom event to update login state
       window.dispatchEvent(new Event('loginStateChanged'));
-      // Redirect to home page after successful login (temporary fix for 404)
-      navigate("/");
+      
+      // Wait a moment for state to update, then redirect to documents
+      setTimeout(() => {
+        navigate("/documents");
+      }, 100);
+      
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || err.message || "Invalid credentials");
