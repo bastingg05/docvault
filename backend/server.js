@@ -46,7 +46,8 @@ const healthData = {
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logger + monitoring
 app.use((req, res, next) => {
@@ -69,179 +70,137 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check
+// Enhanced health check with better error handling
 app.get("/health", (req, res) => {
-  const uptime = Date.now() - startTime;
-
-  healthData.uptime = uptime;
-  healthData.timestamp = new Date().toISOString();
-  healthData.memory = {
-    used: process.memoryUsage().heapUsed,
-    total: process.memoryUsage().heapTotal,
-    external: process.memoryUsage().external
-  };
-
-  // Check DB status
-  healthData.database = dbConnected ? "connected" : "disconnected";
-
-  if (healthData.database === "connected" && healthData.performance.errorRate < 5) {
-    healthData.status = "healthy";
-  } else if (healthData.database === "connected") {
-    healthData.status = "degraded";
-  } else {
-    healthData.status = "unhealthy";
-  }
-
-  res.status(200).json(healthData);
-});
-
-// Detailed health
-app.get("/health/detailed", (req, res) => {
-  const uptime = Date.now() - startTime;
-
-  res.status(200).json({
-    ...healthData,
-    uptime,
-    uptimeFormatted: formatUptime(uptime),
-    system: {
-      nodeVersion: process.version,
-      platform: process.platform,
-      arch: process.arch,
-      pid: process.pid,
-      uptime: process.uptime()
-    },
-    performance: {
-      ...healthData.performance,
-      uptimePercentage: calculateUptimePercentage(startTime)
-    }
-  });
-});
-
-// Uptime
-app.get("/uptime", (req, res) => {
-  const uptime = Date.now() - startTime;
-
-  res.json({
-    uptime,
-    uptimeFormatted: formatUptime(uptime),
-    startTime: new Date(startTime).toISOString(),
-    currentTime: new Date().toISOString(),
-    uptimePercentage: calculateUptimePercentage(startTime)
-  });
-});
-
-// Metrics for Prometheus
-app.get("/metrics", (req, res) => {
-  const uptime = Date.now() - startTime;
-
-  res.set("Content-Type", "text/plain");
-  res.send(`
-# HELP docuvault_uptime_seconds Total uptime in seconds
-# TYPE docuvault_uptime_seconds counter
-docuvault_uptime_seconds ${Math.floor(uptime / 1000)}
-
-# HELP docuvault_requests_total Total number of requests
-# TYPE docuvault_requests_total counter
-docuvault_requests_total ${requestCount}
-
-# HELP docuvault_errors_total Total number of errors
-# TYPE docuvault_errors_total counter
-docuvault_errors_total ${errorCount}
-
-# HELP docuvault_error_rate Error rate percentage
-# TYPE docuvault_error_rate gauge
-docuvault_error_rate ${((errorCount / requestCount) * 100) || 0}
-
-# HELP docuvault_memory_heap_used_bytes Memory heap used in bytes
-# TYPE docuvault_memory_heap_used_bytes gauge
-docuvault_memory_heap_used_bytes ${process.memoryUsage().heapUsed}
-
-# HELP docuvault_memory_heap_total_bytes Memory heap total in bytes
-# TYPE docuvault_memory_heap_total_bytes gauge
-docuvault_memory_heap_total_bytes ${process.memoryUsage().heapTotal}
-  `);
-});
-
-// Recovery endpoint
-app.post("/health/recover", (req, res) => {
   try {
-    errorCount = 0;
+    const uptime = Date.now() - startTime;
 
-    if (global.gc) global.gc();
-
-    healthData.status = "healthy";
+    healthData.uptime = uptime;
     healthData.timestamp = new Date().toISOString();
+    healthData.memory = {
+      used: process.memoryUsage().heapUsed,
+      total: process.memoryUsage().heapTotal,
+      external: process.memoryUsage().external
+    };
 
-    res.json({ message: "Recovery initiated", status: "recovered", timestamp: new Date().toISOString() });
+    // Check DB status
+    healthData.database = dbConnected ? "connected" : "disconnected";
+
+    if (healthData.database === "connected" && healthData.performance.errorRate < 5) {
+      healthData.status = "healthy";
+    } else if (healthData.database === "connected") {
+      healthData.status = "degraded";
+    } else {
+      healthData.status = "unhealthy";
+    }
+
+    res.status(200).json(healthData);
   } catch (error) {
-    res.status(500).json({ message: "Recovery failed", error: error.message });
+    console.error("Health check error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Health check failed",
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
-// Routes
+// Simple health check for load balancers
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "DocuVault Backend is running",
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: Date.now() - startTime
+  });
+});
+
+// API routes
 app.use("/api/users", userRoutes);
 app.use("/api/documents", documentRoutes);
 
-// Root route
-app.get("/", (req, res) => {
-  res.send("🚀 DocuVault API is running...");
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  errorCount++;
-  console.error("Error:", err);
-
-  res.status(500).json({
-    error: "Internal Server Error",
-    message: process.env.NODE_ENV === "development" ? err.message : "Something went wrong",
-    timestamp: new Date().toISOString()
-  });
-});
-
 // 404 handler
-app.use((req, res) => {
+app.use("*", (req, res) => {
   res.status(404).json({
-    error: "Not Found",
-    message: "The requested resource was not found",
+    message: "Route not found",
+    path: req.originalUrl,
     timestamp: new Date().toISOString()
   });
 });
 
-// Helper functions
-function formatUptime(uptime) {
-  const seconds = Math.floor(uptime / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
+// Global error handler
+app.use((error, req, res, next) => {
+  console.error("Global error handler:", error);
+  
+  errorCount++;
+  
+  res.status(error.status || 500).json({
+    message: error.message || "Internal server error",
+    status: "error",
+    timestamp: new Date().toISOString(),
+    path: req.originalUrl
+  });
+});
 
-  if (days > 0) return `${days}d ${hours % 24}h ${minutes % 60}m ${seconds % 60}s`;
-  if (hours > 0) return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-  if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
-  return `${seconds}s`;
-}
-
-function calculateUptimePercentage(startTime) {
-  const uptime = Date.now() - startTime;
-  const totalTime = Date.now();
-  return ((uptime / totalTime) * 100).toFixed(6);
-}
-
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received, shutting down...");
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  console.log('🔄 SIGTERM received, shutting down gracefully...');
   process.exit(0);
 });
 
-process.on("SIGINT", () => {
-  console.log("SIGINT received, shutting down...");
+process.on('SIGINT', () => {
+  console.log('🔄 SIGINT received, shutting down gracefully...');
   process.exit(0);
 });
+
+// Uncaught exception handler
+process.on('uncaughtException', (error) => {
+  console.error('💥 Uncaught Exception:', error);
+  // Don't exit immediately, let the process continue
+});
+
+// Unhandled rejection handler
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+  // Don't exit immediately, let the process continue
+});
+
+// Memory leak detection
+setInterval(() => {
+  const memUsage = process.memoryUsage();
+  const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+  const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
+  
+  if (heapUsedMB > 500) { // Warning at 500MB
+    console.warn(`⚠️ High memory usage: ${heapUsedMB}MB / ${heapTotalMB}MB`);
+  }
+  
+  // Force garbage collection if memory usage is high
+  if (heapUsedMB > 800) { // Force GC at 800MB
+    console.warn('🧹 Forcing garbage collection...');
+    if (global.gc) {
+      global.gc();
+    }
+  }
+}, 60000); // Check every minute
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  console.log(`📊 Health: http://localhost:${PORT}/health`);
-  console.log(`📈 Metrics: http://localhost:${PORT}/metrics`);
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🌐 Health check available at: http://localhost:${PORT}/health`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Demo Mode'}`);
 });
+
+// Server error handling
+server.on('error', (error) => {
+  console.error('💥 Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+    process.exit(1);
+  }
+});
+
+export default app;
