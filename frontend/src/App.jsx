@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import Documents from "./pages/Documents";
 import AddDocument from "./pages/AddDocument";
 import Home from "./pages/Home";
+import HealthDashboard from "./components/HealthDashboard";
 
 // Navigation component that can be conditionally rendered
 function Navigation({ isLoggedIn, handleLogout }) {
@@ -168,6 +169,17 @@ function App() {
     // Check if user is logged in by looking for token in localStorage
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+    
+    // Register service worker for PWA capabilities
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered successfully:', registration);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
   }, []);
 
   // Listen for login state changes
@@ -218,6 +230,17 @@ function App() {
             <Route path="/documents" element={isLoggedIn ? <Documents /> : <Login />} />
             <Route path="/add-document" element={isLoggedIn ? <AddDocument /> : <Login />} />
           </Routes>
+        </div>
+
+        {/* Health Dashboard - Fixed position at bottom right */}
+        <div style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '20px',
+          zIndex: 1000,
+          maxWidth: '400px'
+        }}>
+          <HealthDashboard />
         </div>
       </div>
     </Router>

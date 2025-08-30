@@ -7,7 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "server": "node server.js"
+    "server": "node server.js",
+    "monitor": "node monitor.js",
+    "monitor:dev": "nodemon monitor.js",
+    "health": "curl http://localhost:5000/health",
+    "uptime": "curl http://localhost:5000/uptime",
+    "metrics": "curl http://localhost:5000/metrics",
+    "recover": "curl -X POST http://localhost:5000/health/recover"
   },
   "type": "module",
   "keywords": [],
@@ -19,6 +25,10 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1"
+    "mongoose": "^8.17.1",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
