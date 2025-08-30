@@ -8,6 +8,10 @@ import documentRoutes from "./routes/documentRoutes.js";
 // Load environment variables
 dotenv.config();
 
+console.log("🚀 Starting DocuVault server...");
+console.log("Environment:", process.env.NODE_ENV);
+console.log("MongoDB URI exists:", !!process.env.MONGO_URI);
+
 // Connect to MongoDB - Updated for Render deployment
 let dbConnected = false;
 connectDB().then(connected => {
