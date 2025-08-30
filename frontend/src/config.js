@@ -5,7 +5,7 @@ export const config = {
     environment: "development"
   },
   production: {
-    apiUrl: "https://docvault-faljtwy6t-bastin-georges-projects.vercel.app", // Your current Vercel backend URL
+    apiUrl: "https://docvault-1.onrender.com", // Your Render backend URL
     environment: "production"
   }
 };

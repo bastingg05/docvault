@@ -6,7 +6,12 @@ import generateToken from "../utils/generateToken.js";
 
 const router = express.Router();
 
-// Test route
+// Test route - explicit path
+router.get("/test", (req, res) => {
+  res.json({ message: "User routes test endpoint working", timestamp: new Date().toISOString() });
+});
+
+// Test route - root path
 router.get("/", (req, res) => {
   res.json({ message: "User routes are working", timestamp: new Date().toISOString() });
 });
