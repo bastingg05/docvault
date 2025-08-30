@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/mongodb.js";
+import connectDB from "./config/db.js";
 import userRoutes from "./routes/userroutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 
