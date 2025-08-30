@@ -118,40 +118,6 @@ const HealthDashboard = ({ onClose }) => {
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
       backdropFilter: 'blur(10px)'
     }}>
-      {/* Close Button */}
-      <button
-        onClick={handleClose}
-        style={{
-          position: 'absolute',
-          top: '15px',
-          right: '15px',
-          background: 'rgba(255, 107, 107, 0.2)',
-          border: '1px solid rgba(255, 107, 107, 0.3)',
-          color: '#ff6b6b',
-          borderRadius: '50%',
-          width: '30px',
-          height: '30px',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '16px',
-          transition: 'all 0.3s ease',
-          zIndex: 1000
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.background = 'rgba(255, 107, 107, 0.3)';
-          e.target.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.background = 'rgba(255, 107, 107, 0.2)';
-          e.target.style.transform = 'scale(1)';
-        }}
-        title="Close Health Dashboard"
-      >
-        ✕
-      </button>
-
       <div 
         className="health-header"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -165,7 +131,7 @@ const HealthDashboard = ({ onClose }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          marginRight: '40px' // Make space for close button
+          position: 'relative'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -181,6 +147,45 @@ const HealthDashboard = ({ onClose }) => {
             {getStatusIcon(healthStatus.status || 'unknown')} {healthStatus.status || 'Unknown'}
           </span>
         </div>
+        
+        {/* Close Tab Button - Positioned at the top right of the header */}
+        <button
+          onClick={handleClose}
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            right: '-8px',
+            background: 'rgba(255, 107, 107, 0.9)',
+            border: '2px solid rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            borderRadius: '50%',
+            width: '24px',
+            height: '24px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            zIndex: 1000,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.background = 'rgba(255, 107, 107, 1)';
+            e.target.style.transform = 'scale(1.1)';
+            e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.background = 'rgba(255, 107, 107, 0.9)';
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+          }}
+          title="Close Health Dashboard"
+        >
+          ✕
+        </button>
+        
         <span style={{ fontSize: '14px', color: '#888' }}>
           {isExpanded ? '▼' : '▶'}
         </span>

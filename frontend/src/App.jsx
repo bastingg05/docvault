@@ -134,35 +134,6 @@ function Navigation({ isLoggedIn, handleLogout, showHealthDashboard, setShowHeal
           }}
           >➕ ADD DOCUMENT</Link>
           
-          {/* Health Dashboard Toggle Button */}
-          <button
-            onClick={() => setShowHealthDashboard(!showHealthDashboard)}
-            style={{ 
-              textDecoration: "none", 
-              color: showHealthDashboard ? "#ff6b6b" : "#00d4ff",
-              padding: "10px 16px",
-              borderRadius: "8px",
-              transition: "all 0.3s ease",
-              display: "inline-block",
-              letterSpacing: "1px",
-              background: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "inherit"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = showHealthDashboard ? "rgba(255,107,107,0.1)" : "rgba(0,212,255,0.1)";
-              e.target.style.boxShadow = showHealthDashboard ? "0 0 20px rgba(255,107,107,0.3)" : "0 0 20px rgba(0,212,255,0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "transparent";
-              e.target.style.boxShadow = "none";
-            }}
-            title={showHealthDashboard ? "Hide Health Dashboard" : "Show Health Dashboard"}
-          >
-            {showHealthDashboard ? "📊 HIDE HEALTH" : "📊 SHOW HEALTH"}
-          </button>
-          
           <button onClick={handleLogout} style={{ 
             background: "none", 
             border: "none", 
