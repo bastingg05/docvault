@@ -1,0 +1,95 @@
+import express from "express";
+import cors from "cors";
+import jwt from "jsonwebtoken";
+
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Mock data
+const mockUsers = [
+  { id: 1, email: 'bastin123@gmail.com', password: 'test123' }
+];
+
+const mockDocuments = [
+  { id: 1, title: 'Sample Document 1', description: 'This is a sample document', uploadDate: new Date().toISOString(), size: '1.2 MB' },
+  { id: 2, title: 'Sample Document 2', description: 'Another sample document', uploadDate: new Date().toISOString(), size: '856 KB' }
+];
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// Mock login endpoint
+app.post("/api/users/login", (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+  
+  const user = mockUsers.find(u => u.email === email && u.password === password);
+  
+  if (user) {
+    const token = jwt.sign(
+      { email: user.email, userId: user.id },
+      process.env.JWT_SECRET || 'fallback-secret',
+      { expiresIn: '24h' }
+    );
+    
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: { email: user.email, id: user.id }
+    });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
+  }
+});
+
+// Mock documents endpoint
+app.get("/api/documents", (req, res) => {
+  res.status(200).json({ documents: mockDocuments });
+});
+
+app.post("/api/documents", (req, res) => {
+  const { title, description } = req.body;
+  
+  const newDoc = {
+    id: Date.now(),
+    title: title || 'Untitled Document',
+    description: description || '',
+    uploadDate: new Date().toISOString(),
+    size: '1.5 MB'
+  };
+  
+  mockDocuments.push(newDoc);
+  
+  res.status(201).json({
+    message: 'Document uploaded successfully',
+    document: newDoc
+  });
+});
+
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({ message: "DocuVault Mock API Server", endpoints: ["/health", "/api/users/login", "/api/documents"] });
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Mock API Server running on port ${PORT}`);
+  console.log(`Health check: http://localhost:${PORT}/health`);
+  console.log(`Login: POST http://localhost:${PORT}/api/users/login`);
+  console.log(`Documents: GET/POST http://localhost:${PORT}/api/documents`);
+});
