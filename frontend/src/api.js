@@ -1,19 +1,19 @@
-import axios from "axios";
-import { getApiUrl } from "./config.js";
+import axios from 'axios';
+import { getApiUrl } from './config.js';
 
-const API_BASE_URL = getApiUrl();
-
-console.log(`🌐 API Base URL: ${API_BASE_URL}`);
-
-const API = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000, // 10 second timeout
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: 'http://localhost:5000', // Force localhost for now
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Add request interceptor to attach token
-API.interceptors.request.use(
+// Request interceptor to add auth token
+api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,17 +24,18 @@ API.interceptors.request.use(
   }
 );
 
-// Add response interceptor for better error handling
-API.interceptors.response.use(
-  (response) => response,
+// Response interceptor to handle errors
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token and redirect to login
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
 );
 
-export default API;
+export default api;

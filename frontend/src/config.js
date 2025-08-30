@@ -5,7 +5,7 @@ export const config = {
     environment: "development"
   },
   production: {
-    apiUrl: "https://docvault-1.onrender.com", // Your Render backend URL
+    apiUrl: "http://localhost:5000", // Use local backend for now
     environment: "production"
   }
 };
@@ -22,7 +22,7 @@ export const getApiUrl = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  
+
   // Use environment-specific config
   return getCurrentConfig().apiUrl;
 };
