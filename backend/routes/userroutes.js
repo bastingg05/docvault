@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
 });
 
 // login
-router.post("/login", async (req, res) => {
+router.post("/api/users/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     // Check if MongoDB is connected

@@ -19,14 +19,22 @@ app.use(cors());
 app.use(express.json());
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/health", async (req, res) => {
+  let dbStatus = 'Unknown';
+  try {
+    // Simple check if DB is connected
+    await User.estimatedDocumentCount();
+    dbStatus = 'MongoDB Connected';
+  } catch {
+    dbStatus = 'MongoDB Disconnected';
+  }
   res.status(200).json({
     status: 'healthy',
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     version: '1.0.0',
     environment: process.env.NODE_ENV || 'development',
-    database: 'MongoDB Connected'
+    database: dbStatus
   });
 });
 
@@ -42,11 +50,11 @@ const authenticateToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret');
     const user = await User.findById(decoded.userId);
-    
+
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
-    
+
     req.user = user;
     next();
   } catch (error) {
@@ -58,23 +66,24 @@ const authenticateToken = async (req, res, next) => {
 app.post("/api/users/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    
+
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
-    
+
     const user = await User.findOne({ email });
-    
+
+    // NOTE: In production, use hashed passwords!
     if (!user || user.password !== password) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-    
+
     const token = jwt.sign(
       { email: user.email, userId: user._id },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
-    
+
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -90,31 +99,31 @@ app.post("/api/users/login", async (req, res) => {
 app.post("/api/users/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    
+
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email and password are required' });
     }
-    
+
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({ message: 'User with this email already exists' });
     }
-    
-    // Create new user
+
+    // NOTE: In production, hash the password before saving!
     const newUser = await User.create({
       name,
       email,
       password
     });
-    
+
     // Generate token for new user
     const token = jwt.sign(
       { email: newUser.email, userId: newUser._id },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '24h' }
     );
-    
+
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -141,13 +150,13 @@ app.get("/api/documents", authenticateToken, async (req, res) => {
 app.post("/api/documents", authenticateToken, async (req, res) => {
   try {
     const { title, description } = req.body;
-    
+
     const newDoc = await Document.create({
       title: title || 'Untitled Document',
       description: description || '',
       userId: req.user._id
     });
-    
+
     res.status(201).json({
       message: 'Document created successfully',
       document: newDoc
@@ -162,16 +171,16 @@ app.post("/api/documents", authenticateToken, async (req, res) => {
 app.delete("/api/documents/:id", authenticateToken, async (req, res) => {
   try {
     const documentId = req.params.id;
-    
+
     const document = await Document.findOneAndDelete({
       _id: documentId,
       userId: req.user._id
     });
-    
+
     if (!document) {
       return res.status(404).json({ message: 'Document not found' });
     }
-    
+
     res.status(200).json({
       message: 'Document deleted successfully',
       document
@@ -184,12 +193,12 @@ app.delete("/api/documents/:id", authenticateToken, async (req, res) => {
 
 // Root endpoint
 app.get("/", (req, res) => {
-  res.json({ 
-    message: "DocuVault MongoDB API Server", 
+  res.json({
+    message: "DocuVault MongoDB API Server",
     endpoints: [
-      "/health", 
-      "/api/users/login", 
-      "/api/users/register", 
+      "/health",
+      "/api/users/login",
+      "/api/users/register",
       "/api/documents (GET, POST, DELETE)"
     ],
     database: "MongoDB"
