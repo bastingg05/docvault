@@ -86,8 +86,8 @@ class HealthService {
     try {
       const startTime = Date.now();
       
-      // Check backend health
-      const healthResponse = await fetch('/api/health', {
+      // Check backend health - use the correct endpoint
+      const healthResponse = await fetch('https://docvault-1.onrender.com/health', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -163,17 +163,11 @@ class HealthService {
 
   async sendHeartbeat() {
     try {
-      await fetch('/api/health/heartbeat', {
-        method: 'POST',
+      await fetch('https://docvault-1.onrender.com/health', {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          timestamp: Date.now(),
-          userAgent: navigator.userAgent,
-          online: this.isOnline,
-          connectionQuality: this.connectionQuality
-        })
+        }
       });
     } catch (error) {
       console.log('Heartbeat failed:', error);
