@@ -56,6 +56,44 @@ app.post("/api/users/login", (req, res) => {
   }
 });
 
+// Mock registration endpoint
+app.post("/api/users/register", (req, res) => {
+  const { name, email, password } = req.body;
+  
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: 'Name, email and password are required' });
+  }
+  
+  // Check if user already exists
+  const existingUser = mockUsers.find(u => u.email === email);
+  if (existingUser) {
+    return res.status(409).json({ message: 'User with this email already exists' });
+  }
+  
+  // Create new user
+  const newUser = {
+    id: mockUsers.length + 1,
+    name,
+    email,
+    password
+  };
+  
+  mockUsers.push(newUser);
+  
+  // Generate token for new user
+  const token = jwt.sign(
+    { email: newUser.email, userId: newUser.id },
+    process.env.JWT_SECRET || 'fallback-secret',
+    { expiresIn: '24h' }
+  );
+  
+  res.status(201).json({
+    message: 'User registered successfully',
+    token,
+    user: { name: newUser.name, email: newUser.email, id: newUser.id }
+  });
+});
+
 // Mock documents endpoint
 app.get("/api/documents", (req, res) => {
   res.status(200).json({ documents: mockDocuments });
