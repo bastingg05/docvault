@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Use environment variable for API URL, fallback to working backend for production
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://docuvault-aopsbaexu-bastin-georges-projects.vercel.app/api";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://docvault-1.onrender.com/api";
 
 const API = axios.create({
   baseURL: API_BASE_URL,
