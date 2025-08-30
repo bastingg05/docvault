@@ -3,7 +3,8 @@ import API from "../api";
 // Get all documents for the logged-in user
 export const getDocuments = async () => {
   const { data } = await API.get("/documents");
-  return data;
+  // Mock API returns { documents: [...] }, so we need to extract the documents array
+  return data.documents || data;
 };
 
 // Create a new document

@@ -129,7 +129,7 @@ function Documents() {
         }}>
           {documents.map((doc) => (
             <div 
-              key={doc._id} 
+              key={doc._id || doc.id} 
               style={{ 
                 border: "1px solid #ddd", 
                 borderRadius: "10px", 
@@ -156,7 +156,7 @@ function Documents() {
                   }}>{doc.title}</h3>
                   <div style={{ marginBottom: "8px" }}>
                     <span style={{ fontWeight: "bold", color: "#333" }}>Category:</span>
-                    <span style={{ color: "#666", marginLeft: "5px" }}>{doc.category}</span>
+                    <span style={{ color: "#666", marginLeft: "5px" }}>{doc.category || 'General'}</span>
                   </div>
                   <div style={{ marginBottom: "8px" }}>
                     <span style={{ fontWeight: "bold", color: "#333" }}>Expiry Date:</span>
@@ -164,7 +164,7 @@ function Documents() {
                   </div>
                   <div style={{ marginBottom: "15px" }}>
                     <span style={{ fontWeight: "bold", color: "#333" }}>Added:</span>
-                    <span style={{ color: "#666", marginLeft: "5px" }}>{new Date(doc.createdAt).toLocaleDateString()}</span>
+                    <span style={{ color: "#666", marginLeft: "5px" }}>{new Date(doc.uploadDate || doc.createdAt).toLocaleDateString()}</span>
                   </div>
                   {doc.fileUrl && (
                     <a 
@@ -187,7 +187,7 @@ function Documents() {
                   )}
                 </div>
                 <button 
-                  onClick={() => handleDelete(doc._id)}
+                  onClick={() => handleDelete(doc._id || doc.id)}
                   style={{ 
                     padding: "8px 16px", 
                     backgroundColor: "#dc3545", 
