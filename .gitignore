@@ -111,3 +111,4 @@ backend/uploads/
 # Package lock files (optional - some prefer to commit these)
 # package-lock.json
 # yarn.lock
+.vercel

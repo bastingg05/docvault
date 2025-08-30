@@ -5,7 +5,7 @@ export const config = {
     environment: "development"
   },
   production: {
-    apiUrl: "https://your-backend-app-name.vercel.app", // Replace with your actual Vercel backend URL
+    apiUrl: "https://docvault-faljtwy6t-bastin-georges-projects.vercel.app", // Your current Vercel backend URL
     environment: "production"
   }
 };
