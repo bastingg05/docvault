@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import HealthDashboard from "./components/HealthDashboard";
 
 // Navigation component that can be conditionally rendered
-function Navigation({ isLoggedIn, handleLogout }) {
+function Navigation({ isLoggedIn, handleLogout, showHealthDashboard, setShowHealthDashboard }) {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
   
@@ -133,6 +133,36 @@ function Navigation({ isLoggedIn, handleLogout }) {
             e.target.style.boxShadow = "none";
           }}
           >➕ ADD DOCUMENT</Link>
+          
+          {/* Health Dashboard Toggle Button */}
+          <button
+            onClick={() => setShowHealthDashboard(!showHealthDashboard)}
+            style={{ 
+              textDecoration: "none", 
+              color: showHealthDashboard ? "#ff6b6b" : "#00d4ff",
+              padding: "10px 16px",
+              borderRadius: "8px",
+              transition: "all 0.3s ease",
+              display: "inline-block",
+              letterSpacing: "1px",
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "inherit"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = showHealthDashboard ? "rgba(255,107,107,0.1)" : "rgba(0,212,255,0.1)";
+              e.target.style.boxShadow = showHealthDashboard ? "0 0 20px rgba(255,107,107,0.3)" : "0 0 20px rgba(0,212,255,0.3)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "transparent";
+              e.target.style.boxShadow = "none";
+            }}
+            title={showHealthDashboard ? "Hide Health Dashboard" : "Show Health Dashboard"}
+          >
+            {showHealthDashboard ? "📊 HIDE HEALTH" : "📊 SHOW HEALTH"}
+          </button>
+          
           <button onClick={handleLogout} style={{ 
             background: "none", 
             border: "none", 
@@ -164,6 +194,7 @@ function Navigation({ isLoggedIn, handleLogout }) {
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showHealthDashboard, setShowHealthDashboard] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in by looking for token in localStorage
@@ -210,7 +241,12 @@ function App() {
         overflowX: "hidden",
         overflowY: "auto"
       }}>
-        <Navigation isLoggedIn={isLoggedIn} handleLogout={handleLogout} />
+        <Navigation 
+          isLoggedIn={isLoggedIn} 
+          handleLogout={handleLogout} 
+          showHealthDashboard={showHealthDashboard}
+          setShowHealthDashboard={setShowHealthDashboard}
+        />
 
         <div style={{ 
           flex: 1,
@@ -233,15 +269,17 @@ function App() {
         </div>
 
         {/* Health Dashboard - Fixed position at bottom right */}
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          zIndex: 1000,
-          maxWidth: '400px'
-        }}>
-          <HealthDashboard />
-        </div>
+        {showHealthDashboard && (
+          <div style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            zIndex: 1000,
+            maxWidth: '400px'
+          }}>
+            <HealthDashboard onClose={() => setShowHealthDashboard(false)} />
+          </div>
+        )}
       </div>
     </Router>
   );

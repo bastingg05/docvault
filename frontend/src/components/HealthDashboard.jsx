@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import healthService from '../services/healthService';
 
-const HealthDashboard = () => {
+const HealthDashboard = ({ onClose }) => {
   const [healthStatus, setHealthStatus] = useState({});
   const [healthHistory, setHealthHistory] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -39,6 +39,12 @@ const HealthDashboard = () => {
   const updateHealthStatus = () => {
     setHealthStatus(healthService.getHealthStatus());
     setHealthHistory(healthService.getHealthHistory());
+  };
+
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
   };
 
   const formatUptime = (milliseconds) => {
@@ -102,7 +108,50 @@ const HealthDashboard = () => {
   };
 
   return (
-    <div className="health-dashboard">
+    <div className="health-dashboard" style={{
+      position: 'relative',
+      background: 'rgba(0, 0, 0, 0.9)',
+      borderRadius: '15px',
+      padding: '20px',
+      margin: '20px',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+      backdropFilter: 'blur(10px)'
+    }}>
+      {/* Close Button */}
+      <button
+        onClick={handleClose}
+        style={{
+          position: 'absolute',
+          top: '15px',
+          right: '15px',
+          background: 'rgba(255, 107, 107, 0.2)',
+          border: '1px solid rgba(255, 107, 107, 0.3)',
+          color: '#ff6b6b',
+          borderRadius: '50%',
+          width: '30px',
+          height: '30px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '16px',
+          transition: 'all 0.3s ease',
+          zIndex: 1000
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'rgba(255, 107, 107, 0.3)';
+          e.target.style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'rgba(255, 107, 107, 0.2)';
+          e.target.style.transform = 'scale(1)';
+        }}
+        title="Close Health Dashboard"
+      >
+        ✕
+      </button>
+
       <div 
         className="health-header"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -115,7 +164,8 @@ const HealthDashboard = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          marginRight: '40px' // Make space for close button
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
