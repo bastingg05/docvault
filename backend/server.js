@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import connectDB from "./config/db.js";
+import connectDB from "./config/mongodb.js";
 import userRoutes from "./routes/userroutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 
@@ -9,7 +9,15 @@ import documentRoutes from "./routes/documentRoutes.js";
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+let dbConnected = false;
+connectDB().then(connected => {
+  dbConnected = connected;
+  if (connected) {
+    console.log("🚀 Database connection established successfully");
+  } else {
+    console.log("⚠️ Running in demo mode without database connection");
+  }
+});
 
 const app = express();
 
@@ -68,7 +76,7 @@ app.get("/health", (req, res) => {
   };
 
   // Check DB status
-  healthData.database = global.mongooseConnectionReady ? "connected" : "disconnected";
+  healthData.database = dbConnected ? "connected" : "disconnected";
 
   if (healthData.database === "connected" && healthData.performance.errorRate < 5) {
     healthData.status = "healthy";

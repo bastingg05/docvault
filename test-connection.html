@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+</head>
+<body>
+    <h1>DocuVault API Connection Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const resultsDiv = document.getElementById('results');
+        
+        async function testConnection() {
+            try {
+                // Test backend health endpoint
+                const healthResponse = await fetch('http://localhost:5000/health');
+                const healthData = await healthResponse.json();
+                
+                resultsDiv.innerHTML += `
+                    <h3>✅ Backend Health Check</h3>
+                    <p>Status: ${healthData.status}</p>
+                    <p>Database: ${healthData.database}</p>
+                    <p>Uptime: ${Math.floor(healthData.uptime / 1000)}s</p>
+                `;
+                
+                // Test user routes
+                const userResponse = await fetch('http://localhost:5000/api/users');
+                const userData = await userResponse.json();
+                
+                resultsDiv.innerHTML += `
+                    <h3>✅ User Routes Test</h3>
+                    <p>Message: ${userData.message}</p>
+                    <p>Timestamp: ${userData.timestamp}</p>
+                `;
+                
+                // Test CORS
+                resultsDiv.innerHTML += `
+                    <h3>✅ CORS Test</h3>
+                    <p>CORS headers present: ${healthResponse.headers.get('Access-Control-Allow-Origin') ? 'Yes' : 'No'}</p>
+                `;
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `
+                    <h3>❌ Connection Error</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>This indicates a network connectivity issue between frontend and backend.</p>
+                `;
+            }
+        }
+        
+        // Run test when page loads
+        testConnection();
+    </script>
+</body>
+</html>

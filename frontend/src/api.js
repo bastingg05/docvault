@@ -1,13 +1,14 @@
 import axios from "axios";
+import { getApiUrl } from "./config.js";
 
-// Use environment variable for API URL, fallback to working backend for production
-const API_BASE_URL = import.meta.env.VITE_API_URL || "https://docvault-1.onrender.com";
+const API_BASE_URL = getApiUrl();
+
+console.log(`🌐 API Base URL: ${API_BASE_URL}`);
 
 const API = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000, // 10 second timeout
 });
-
-// ...existing code...
 
 // Add request interceptor to attach token
 API.interceptors.request.use(

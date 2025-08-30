@@ -6,6 +6,11 @@ import generateToken from "../utils/generateToken.js";
 
 const router = express.Router();
 
+// Test route
+router.get("/", (req, res) => {
+  res.json({ message: "User routes are working", timestamp: new Date().toISOString() });
+});
+
 // register
 router.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
@@ -44,7 +49,7 @@ router.post("/register", async (req, res) => {
 });
 
 // login
-router.post("/api/users/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     // Check if MongoDB is connected
