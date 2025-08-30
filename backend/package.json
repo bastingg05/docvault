@@ -5,14 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
+    "start": "node mock-api.js",
     "dev": "nodemon server.js",
     "server": "node server.js",
+    "mock": "node mock-api.js",
     "monitor": "node monitor.js",
     "monitor:dev": "nodemon monitor.js",
     "health": "curl http://localhost:5000/health",
-    "uptime": "curl http://localhost:5000/uptime",
-    "metrics": "curl http://localhost:5000/metrics",
+    "uptime": "curl http://localhost:5000/health/uptime",
+    "metrics": "curl http://localhost:5000/health/metrics",
     "recover": "curl -X POST http://localhost:5000/health/recover"
   },
   "type": "module",

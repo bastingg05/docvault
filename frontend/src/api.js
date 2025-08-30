@@ -1,16 +1,37 @@
 import axios from "axios";
 
+// Use environment variable for API URL, fallback to working backend for production
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://docuvault-aopsbaexu-bastin-georges-projects.vercel.app/api";
+
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // backend base URL
+  baseURL: API_BASE_URL,
 });
 
-// Add token automatically if stored in localStorage
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+// Add request interceptor to attach token
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return req;
-});
+);
+
+// Add response interceptor for better error handling
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Unauthorized - clear token and redirect to login
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default API;
