@@ -20,8 +20,8 @@ function Login() {
       console.log("Logged in:", user);
       // Dispatch custom event to update login state
       window.dispatchEvent(new Event('loginStateChanged'));
-      // Redirect to documents page after successful login
-      navigate("/documents");
+      // Redirect to home page after successful login (temporary fix for 404)
+      navigate("/");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.response?.data?.message || err.message || "Invalid credentials");
