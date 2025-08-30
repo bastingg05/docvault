@@ -116,22 +116,62 @@ const HealthDashboard = ({ onClose }) => {
       margin: '20px',
       border: '1px solid rgba(255, 255, 255, 0.1)',
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-      backdropFilter: 'blur(10px)'
+      backdropFilter: 'blur(10px)',
+      minWidth: '350px'
     }}>
+      {/* Close Tab Button - Positioned at the top right corner of the entire dashboard */}
+      <button
+        onClick={handleClose}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '15px',
+          background: 'rgba(255, 107, 107, 0.9)',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          color: 'white',
+          borderRadius: '50%',
+          width: '28px',
+          height: '28px',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          transition: 'all 0.3s ease',
+          zIndex: 1000,
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.background = 'rgba(255, 107, 107, 1)';
+          e.target.style.transform = 'scale(1.1)';
+          e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.background = 'rgba(255, 107, 107, 0.9)';
+          e.target.style.transform = 'scale(1)';
+          e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+        }}
+        title="Close Health Dashboard"
+      >
+        ✕
+      </button>
+
       <div 
         className="health-header"
         onClick={() => setIsExpanded(!isExpanded)}
         style={{
           cursor: 'pointer',
-          padding: '10px 15px',
+          padding: '15px 20px',
           background: 'rgba(0, 0, 0, 0.8)',
           borderRadius: '10px',
-          marginBottom: '10px',
+          marginBottom: '15px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          position: 'relative'
+          position: 'relative',
+          marginTop: '10px'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -148,44 +188,6 @@ const HealthDashboard = ({ onClose }) => {
           </span>
         </div>
         
-        {/* Close Tab Button - Positioned at the top right of the header */}
-        <button
-          onClick={handleClose}
-          style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            background: 'rgba(255, 107, 107, 0.9)',
-            border: '2px solid rgba(255, 255, 255, 0.2)',
-            color: 'white',
-            borderRadius: '50%',
-            width: '24px',
-            height: '24px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transition: 'all 0.3s ease',
-            zIndex: 1000,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(255, 107, 107, 1)';
-            e.target.style.transform = 'scale(1.1)';
-            e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(255, 107, 107, 0.9)';
-            e.target.style.transform = 'scale(1)';
-            e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
-          }}
-          title="Close Health Dashboard"
-        >
-          ✕
-        </button>
-        
         <span style={{ fontSize: '14px', color: '#888' }}>
           {isExpanded ? '▼' : '▶'}
         </span>
@@ -198,48 +200,65 @@ const HealthDashboard = ({ onClose }) => {
           padding: '20px',
           border: '1px solid rgba(255, 255, 255, 0.1)'
         }}>
-          {/* Uptime Section */}
-          <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#00d4ff', marginBottom: '10px' }}>⏰ Uptime</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-              <div style={{ textAlign: 'center', padding: '15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#00ff88' }}>
-                  {calculateUptimePercentage()}%
-                </div>
-                <div style={{ fontSize: '12px', color: '#888' }}>Uptime</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#00d4ff' }}>
-                  {formatUptime(uptime)}
-                </div>
-                <div style={{ fontSize: '12px', color: '#888' }}>Current Session</div>
-              </div>
+          {/* Connection Quality Section - Right Aligned */}
+          <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+            <h3 style={{ color: '#00d4ff', marginBottom: '10px', textAlign: 'right' }}>📶 Connection Quality</h3>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end', 
+              alignItems: 'center', 
+              gap: '10px',
+              padding: '10px 15px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <span style={{ fontSize: '14px', color: '#ccc' }}>Quality:</span>
+              <span style={{ 
+                fontSize: '16px', 
+                fontWeight: 'bold', 
+                color: getConnectionQualityColor(healthStatus.connectionQuality || 'unknown') 
+              }}>
+                {healthStatus.connectionQuality || 'Unknown'}
+              </span>
             </div>
           </div>
 
-          {/* Connection Status */}
-          <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#00d4ff', marginBottom: '10px' }}>🌐 Connection</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-              <div style={{ textAlign: 'center', padding: '15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: getConnectionQualityColor(healthStatus.connectionQuality || 'unknown') }}>
-                  {getConnectionIcon(healthStatus.connectionQuality || 'unknown')} {healthStatus.connectionQuality || 'Unknown'}
-                </div>
-                <div style={{ fontSize: '12px', color: '#888' }}>Connection Quality</div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '15px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: healthStatus.isOnline ? '#00ff88' : '#ff4444' }}>
-                  {healthStatus.isOnline ? '🟢 Online' : '🔴 Offline'}
-                </div>
-                <div style={{ fontSize: '12px', color: '#888' }}>Network Status</div>
-              </div>
+          {/* Network Status Section - Right Aligned */}
+          <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+            <h3 style={{ color: '#00d4ff', marginBottom: '10px', textAlign: 'right' }}>🌐 Network Status</h3>
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'flex-end', 
+              alignItems: 'center', 
+              gap: '10px',
+              padding: '10px 15px',
+              background: 'rgba(255, 255, 255, 0.05)',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
+              <span style={{ fontSize: '14px', color: '#ccc' }}>Status:</span>
+              <span style={{ 
+                fontSize: '16px', 
+                fontWeight: 'bold', 
+                color: healthStatus.isOnline ? '#00ff88' : '#ff4444' 
+              }}>
+                {healthStatus.isOnline ? '🟢 Online' : '🔴 Offline'}
+              </span>
             </div>
           </div>
 
-          {/* Health History */}
+          {/* Recent Health Checks Section - Right Aligned */}
           <div style={{ marginBottom: '20px' }}>
-            <h3 style={{ color: '#00d4ff', marginBottom: '10px' }}>📈 Recent Health Checks</h3>
-            <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+            <h3 style={{ color: '#00d4ff', marginBottom: '10px', textAlign: 'right' }}>📈 Recent Health Checks</h3>
+            <div style={{ 
+              maxHeight: '200px', 
+              overflowY: 'auto',
+              background: 'rgba(255, 255, 255, 0.03)',
+              borderRadius: '8px',
+              padding: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
               {healthHistory.slice(-10).reverse().map((check, index) => (
                 <div 
                   key={index}
@@ -251,7 +270,8 @@ const HealthDashboard = ({ onClose }) => {
                     margin: '5px 0',
                     background: 'rgba(255, 255, 255, 0.05)',
                     borderRadius: '6px',
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.05)'
                   }}
                 >
                   <span style={{ color: '#ccc' }}>
@@ -268,8 +288,8 @@ const HealthDashboard = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Actions */}
-          <div style={{ textAlign: 'center' }}>
+          {/* Actions - Right Aligned */}
+          <div style={{ textAlign: 'right' }}>
             <button
               onClick={() => healthService.forceHealthCheck()}
               style={{
@@ -279,8 +299,17 @@ const HealthDashboard = ({ onClose }) => {
                 padding: '10px 20px',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                margin: '0 10px',
-                fontSize: '14px'
+                margin: '0 10px 10px 0',
+                fontSize: '14px',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 212, 255, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
               }}
             >
               🔄 Refresh Health
@@ -294,8 +323,17 @@ const HealthDashboard = ({ onClose }) => {
                 padding: '10px 20px',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                margin: '0 10px',
-                fontSize: '14px'
+                margin: '0 0 10px 0',
+                fontSize: '14px',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
               }}
             >
               📊 Update Metrics
