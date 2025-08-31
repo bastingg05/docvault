@@ -99,6 +99,8 @@ async function connectDB() {
     return true;
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
+    console.log('⚠️ Running in demo mode without database connection');
+    console.log('💡 To fix this, add your IP to MongoDB Atlas whitelist or use a different database');
     return false;
   }
 }
@@ -139,6 +141,27 @@ app.post('/api/users/login', async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Check if MongoDB is connected
+    if (mongoose.connection.readyState !== 1) {
+      // Demo mode - accept any email/password combination
+      const token = jwt.sign(
+        { userId: 'demo-user', email: email },
+        process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
+        { expiresIn: '24h' }
+      );
+
+      res.json({
+        message: 'Login successful (Demo Mode)',
+        user: {
+          _id: 'demo-user',
+          name: email.split('@')[0],
+          email: email
+        },
+        token
+      });
+      return;
     }
 
     const user = await User.findOne({ email });
