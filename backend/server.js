@@ -5,8 +5,9 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userroutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from multiple sources
+dotenv.config(); // Load .env first
+dotenv.config({ path: './env.local' }); // Override with env.local if exists
 
 console.log("🚀 Starting DocuVault server...");
 console.log("Environment:", process.env.NODE_ENV);
