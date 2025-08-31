@@ -19,7 +19,8 @@ export const registerUser = async (name, email, password) => {
     if (data.token) {
       localStorage.setItem("token", data.token);
     }
-    return data;
+    // Return the user object directly for the onLogin callback
+    return { user: data, token: data.token };
   } catch (error) {
     console.error('❌ Registration failed:', error);
     throw error;
@@ -43,14 +44,15 @@ export const loginUser = async (email, password) => {
         token: 'demo-token-' + Date.now()
       };
       localStorage.setItem("token", demoUser.token);
-      return demoUser;
+      return { user: demoUser, token: demoUser.token };
     }
     
     const { data } = await API.post("/api/users/login", { email, password });
     if (data.token) {
       localStorage.setItem("token", data.token);
     }
-    return data;
+    // Return the user object directly for the onLogin callback
+    return { user: data, token: data.token };
   } catch (error) {
     console.error('❌ Login failed:', error);
     
@@ -64,7 +66,7 @@ export const loginUser = async (email, password) => {
         token: 'demo-token-' + Date.now()
       };
       localStorage.setItem("token", demoUser.token);
-      return demoUser;
+      return { user: demoUser, token: demoUser.token };
     }
     
     throw error;

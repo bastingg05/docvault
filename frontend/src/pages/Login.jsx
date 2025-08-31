@@ -28,6 +28,18 @@ const Login = ({ onLogin }) => {
     } catch (error) {
       setApiStatus(`❌ API Failed: ${error.message}`);
       console.error('API Test Error:', error);
+      
+      // Try direct fetch as fallback
+      try {
+        const directResponse = await fetch('http://localhost:5000/health');
+        if (directResponse.ok) {
+          setApiStatus(`✅ Direct API Connected! Status: ${directResponse.status}`);
+        } else {
+          setApiStatus(`❌ Direct API Failed: ${directResponse.status}`);
+        }
+      } catch (directError) {
+        setApiStatus(`❌ Both methods failed: ${error.message}`);
+      }
     }
   };
 
