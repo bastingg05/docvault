@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { registerUser } from '../services/userService';
 
 const Register = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -37,14 +37,10 @@ const Register = ({ onLogin }) => {
     }
 
     try {
-      const response = await axios.post('/api/users/register', {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password
-      });
-      onLogin(response.data.user, response.data.token);
+      const data = await registerUser(formData.name, formData.email, formData.password);
+      onLogin(data.user, data.token);
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      setError(error.userMessage || error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
