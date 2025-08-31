@@ -39,10 +39,10 @@ async function testAPI() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                email: 'bastin123@gmail.com',
-                password: 'bastin123'
-            })
+                    body: JSON.stringify({
+          email: 'test@example.com',
+          password: 'testpass123'
+        })
         });
         
         const loginData = await loginResponse.json();

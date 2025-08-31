@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api.js';
 
 const AddDocument = ({ user }) => {
   const [formData, setFormData] = useState({
@@ -81,15 +81,13 @@ const AddDocument = ({ user }) => {
     }
 
     try {
-      const token = localStorage.getItem('token');
       const uploadData = new FormData();
       uploadData.append('file', file);
       uploadData.append('title', formData.title);
       uploadData.append('description', formData.description);
 
-      await axios.post('/api/documents', uploadData, {
+      await API.post('/api/documents/upload', uploadData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
