@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -367,13 +368,38 @@ app.use('/uploads', express.static('uploads'));
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React app build
-  app.use(express.static(path.join(__dirname, 'frontend', 'dist')));
+  const frontendPath = path.join(__dirname, 'frontend', 'dist');
+  const indexPath = path.join(frontendPath, 'index.html');
+  
+  // Check if frontend files exist
+  if (fs.existsSync(frontendPath) && fs.existsSync(indexPath)) {
+    console.log('✅ Frontend build found, serving static files');
+    // Serve static files from the React app build
+    app.use(express.static(frontendPath));
 
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
-  });
+    // Handle React routing, return all requests to React app
+    app.get('*', (req, res) => {
+      res.sendFile(indexPath);
+    });
+  } else {
+    console.log('⚠️ Frontend build not found, running in API-only mode');
+    console.log('Expected path:', frontendPath);
+    console.log('Expected index.html:', indexPath);
+    
+    // Fallback: serve a simple message
+    app.get('*', (req, res) => {
+      res.json({
+        message: 'DocuVault API is running',
+        note: 'Frontend build not found. Please ensure the build process completed successfully.',
+        apiEndpoints: {
+          health: '/health',
+          login: '/api/users/login',
+          register: '/api/users/register',
+          documents: '/api/documents'
+        }
+      });
+    });
+  }
 }
 
 // Start server
