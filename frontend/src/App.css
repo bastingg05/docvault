@@ -7,7 +7,7 @@
 .main-content {
   flex: 1;
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a0a0a;
   min-height: calc(100vh - 80px);
 }
 
@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a0a0a;
   color: white;
 }
 
@@ -91,10 +91,10 @@
   font-size: 16px;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
 .auth-button:hover {
@@ -133,14 +133,19 @@
   font-size: 48px;
   font-weight: 700;
   margin-bottom: 20px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
 }
 
 .home-subtitle {
   font-size: 20px;
   margin-bottom: 40px;
-  opacity: 0.9;
+  opacity: 0.8;
   line-height: 1.6;
+  color: #cccccc;
 }
 
 .home-features {
@@ -151,33 +156,38 @@
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
+  background: #1a1a1a;
   border-radius: 20px;
   padding: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: transform 0.3s ease;
+  border: 1px solid #333333;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .feature-card:hover {
   transform: translateY(-10px);
+  border-color: #00d4ff;
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
 }
 
 .feature-icon {
   font-size: 48px;
   margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
 }
 
 .feature-title {
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 15px;
+  color: #00d4ff;
 }
 
 .feature-description {
   font-size: 16px;
-  opacity: 0.9;
+  opacity: 0.8;
   line-height: 1.6;
+  color: #cccccc;
 }
 
 /* Documents Page Styling */
