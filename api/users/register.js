@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connectDB from '../../backend/config/db.js';
-import User from '../../backend/models/User.js';
+import connectDB from '../config/db.js';
+import User from '../models/User.js';
 
 export default async function handler(req, res) {
   // Enable CORS

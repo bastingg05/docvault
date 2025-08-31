@@ -1,4 +1,4 @@
-import connectDB from '../backend/config/db.js';
+import connectDB from './config/db.js';
 
 export default async function handler(req, res) {
   // Enable CORS
