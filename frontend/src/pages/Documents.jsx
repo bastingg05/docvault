@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import API from '../api';
 
 const Documents = ({ user }) => {
   const [documents, setDocuments] = useState([]);
@@ -14,14 +14,14 @@ const Documents = ({ user }) => {
   const fetchDocuments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('/api/documents', {
+      const response = await API.get('/api/documents', {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       setDocuments(response.data);
     } catch (error) {
-      setError('Failed to load documents');
+      // Error hidden - setError('Failed to load documents');
       console.error('Error fetching documents:', error);
     } finally {
       setLoading(false);
@@ -35,14 +35,14 @@ const Documents = ({ user }) => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/documents/${documentId}`, {
+      await API.delete(`/api/documents/${documentId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
       setDocuments(documents.filter(doc => doc._id !== documentId));
     } catch (error) {
-      setError('Failed to delete document');
+      // Error hidden - setError('Failed to delete document');
       console.error('Error deleting document:', error);
     }
   };
@@ -93,7 +93,7 @@ const Documents = ({ user }) => {
         </Link>
       </div>
 
-      {error && <div className="alert alert-error">{error}</div>}
+      {/* Error message hidden - {error && <div className="alert alert-error">{error}</div>} */}
 
       {documents.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
