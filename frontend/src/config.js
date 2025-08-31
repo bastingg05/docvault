@@ -5,7 +5,7 @@ export const config = {
   // Backend URL - automatically switches based on environment
   API_BASE_URL: isDevelopment 
     ? 'http://localhost:5000'  // Local development
-    : '', // Production - use relative URLs for Vercel API functions
+    : 'https://docuvault-backend.onrender.com', // Production - Render backend
   
   // Environment info
   ENV: import.meta.env.MODE || 'development',
