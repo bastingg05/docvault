@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/docuvault');
+    // Use MongoDB Atlas connection string as fallback
+    const mongoURI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0';
+    
+    const conn = await mongoose.connect(mongoURI);
     
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     
