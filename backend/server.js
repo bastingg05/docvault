@@ -1,9 +1,15 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userroutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables from multiple sources
 dotenv.config(); // Load .env first
@@ -156,10 +162,37 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/documents", documentRoutes);
 
-// 404 handler
-app.use("*", (req, res) => {
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '..', 'frontend', 'dist');
+  const indexPath = path.join(frontendPath, 'index.html');
+  
+  // Check if frontend build exists
+  if (fs.existsSync(frontendPath) && fs.existsSync(indexPath)) {
+    console.log('✅ Frontend build found, serving static files');
+    app.use(express.static(frontendPath));
+    
+    // Serve index.html for all non-API routes
+    app.get('*', (req, res) => {
+      res.sendFile(indexPath);
+    });
+  } else {
+    console.log('⚠️ Frontend build not found, running in API-only mode');
+    app.get('/', (req, res) => {
+      res.json({
+        message: 'DocuVault Backend API is running',
+        status: 'healthy',
+        frontend: 'not available',
+        timestamp: new Date().toISOString()
+      });
+    });
+  }
+}
+
+// 404 handler for API routes
+app.use("/api/*", (req, res) => {
   res.status(404).json({
-    message: "Route not found",
+    message: "API route not found",
     path: req.originalUrl,
     timestamp: new Date().toISOString()
   });
