@@ -1,28 +1,38 @@
-// Configuration for different environments
+// Environment-based configuration
+const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
+
 export const config = {
-  development: {
-    apiUrl: "http://localhost:5000",
-    environment: "development"
-  },
-  production: {
-    apiUrl: "http://localhost:5000", // Use local backend for now
-    environment: "production"
+  // Backend URL - automatically switches based on environment
+  API_BASE_URL: isDevelopment 
+    ? 'http://localhost:5000'  // Local development
+    : 'https://docuvault-8zhzebnk3-bastin-georges-projects.vercel.app', // Production
+  
+  // Environment info
+  ENV: import.meta.env.MODE || 'development',
+  IS_DEV: isDevelopment,
+  
+  // App settings
+  APP_NAME: 'DocuVault',
+  VERSION: '1.0.0',
+  
+  // Feature flags
+  FEATURES: {
+    OFFLINE_MODE: true,
+    AUTO_RETRY: true,
+    HEALTH_MONITORING: true,
+    CACHING: true
   }
 };
 
-// Get current environment
-export const getCurrentConfig = () => {
-  const env = import.meta.env.MODE || "development";
-  return config[env] || config.development;
+// Helper function to get API URL
+export const getApiUrl = (endpoint = '') => {
+  return `${config.API_BASE_URL}${endpoint}`;
 };
 
-// Get API URL for current environment
-export const getApiUrl = () => {
-  // Check for custom API URL first
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  // Use environment-specific config
-  return getCurrentConfig().apiUrl;
+// Helper function to check if running locally
+export const isLocalhost = () => {
+  return window.location.hostname === 'localhost' || 
+         window.location.hostname === '127.0.0.1';
 };
+
+export default config;

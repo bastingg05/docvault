@@ -187,23 +187,27 @@ setInterval(() => {
   }
 }, 60000); // Check every minute
 
-// Start server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌐 Health check available at: http://localhost:${PORT}/health`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Demo Mode'}`);
-  console.log(`🔗 Frontend should connect to: http://localhost:${PORT}`);
-});
+// Start server only in local development
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌐 Health check available at: http://localhost:${PORT}/health`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Demo Mode'}`);
+    console.log(`🔗 Frontend should connect to: http://localhost:${PORT}`);
+  });
 
-// Server error handling
-server.on('error', (error) => {
-  console.error('💥 Server error:', error);
-  if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
-    process.exit(1);
-  }
-});
+  // Server error handling
+  server.on('error', (error) => {
+    console.error('💥 Server error:', error);
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use`);
+      process.exit(1);
+    }
+  });
+} else {
+  console.log('🚀 Running in Vercel production mode');
+}
 
 export default app;

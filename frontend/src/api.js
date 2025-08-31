@@ -4,7 +4,7 @@ import { NETWORK_CONFIG } from './config/networkConfig.js';
 
 // Create axios instance with enhanced configuration
 const api = axios.create({
-  baseURL: 'https://docuvault-backend.vercel.app', // Use Vercel backend
+  baseURL: getApiUrl(), // Use environment-based configuration
   timeout: NETWORK_CONFIG.TIMEOUTS.API_REQUEST,
   headers: {
     'Content-Type': 'application/json',
