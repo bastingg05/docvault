@@ -2,10 +2,8 @@
 const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
 export const config = {
-  // Backend URL - automatically switches based on environment
-  API_BASE_URL: isDevelopment 
-    ? 'http://localhost:5000'  // Local development
-    : 'https://docuvault.onrender.com', // Production - Render backend
+  // Backend URL - FORCE LOCAL DEVELOPMENT
+  API_BASE_URL: 'http://localhost:5000',  // Always use local backend
   
   // Environment info
   ENV: import.meta.env.MODE || 'development',
