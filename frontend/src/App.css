@@ -124,70 +124,160 @@
 .home-container {
   text-align: center;
   color: white;
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 40px 20px;
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Grid Pattern Background */
+.grid-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glowing Dots */
+.glowing-dot {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  filter: blur(2px);
+  z-index: -1;
+}
+
+.blue-dot {
+  top: 30%;
+  left: 15%;
+  background: #00d4ff;
+  box-shadow: 0 0 30px #00d4ff, 0 0 60px #00d4ff;
+  animation: pulse-blue 3s ease-in-out infinite;
+}
+
+.red-dot {
+  top: 40%;
+  right: 20%;
+  background: #ff4757;
+  box-shadow: 0 0 30px #ff4757, 0 0 60px #ff4757;
+  animation: pulse-red 3s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-blue {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Logo Container */
+.logo-container {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.glowing-logo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.logo-stack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 20px;
+  background: linear-gradient(90deg, #00d4ff 0%, #ff4757 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 71, 87, 0.6);
+}
+
+.logo-bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: 80px;
+  height: 25px;
+  background: linear-gradient(90deg, #00d4ff 0%, #ff4757 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 71, 87, 0.6);
+}
+
+.logo-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  width: 80px;
+  height: 25px;
+  background: linear-gradient(90deg, #00d4ff 0%, #ff4757 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(255, 71, 87, 0.6);
+}
+
+/* Main Title */
 .home-title {
-  font-size: 48px;
-  font-weight: 700;
+  font-size: 64px;
+  font-weight: 900;
   margin-bottom: 20px;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.title-docu {
+  color: white;
+}
+
+.title-vault {
   background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  text-shadow: none;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
 }
 
+/* Subtitle */
 .home-subtitle {
-  font-size: 20px;
-  margin-bottom: 40px;
-  opacity: 0.8;
-  line-height: 1.6;
-  color: #cccccc;
-}
-
-.home-features {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 30px;
-  margin-top: 60px;
-}
-
-.feature-card {
-  background: #1a1a1a;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #333333;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.feature-card:hover {
-  transform: translateY(-10px);
-  border-color: #00d4ff;
-  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
-}
-
-.feature-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
-}
-
-.feature-title {
   font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #00d4ff;
-}
-
-.feature-description {
-  font-size: 16px;
-  opacity: 0.8;
+  margin-bottom: 60px;
+  opacity: 0.9;
   line-height: 1.6;
   color: #cccccc;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+/* Action Buttons */
+.action-buttons {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* Documents Page Styling */

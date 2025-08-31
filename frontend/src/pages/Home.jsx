@@ -4,14 +4,39 @@ import { Link } from 'react-router-dom';
 const Home = ({ user }) => {
   return (
     <div className="home-container">
-      <h1 className="home-title">Welcome to DocuVault V2</h1>
-      <p className="home-subtitle">
-        Your secure and modern document management system. Store, organize, and access your documents from anywhere.
-      </p>
+      {/* Glowing Logo */}
+      <div className="logo-container">
+        <div className="glowing-logo">
+          <div className="logo-stack">
+            <div className="logo-top"></div>
+            <div className="logo-bottom-left"></div>
+            <div className="logo-bottom-right"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Title */}
+      <h1 className="home-title">
+        <span className="title-docu">DOCU</span>
+        <span className="title-vault">VAULT</span>
+      </h1>
       
+      {/* Subtitle */}
+      <p className="home-subtitle">
+        Enterprise Document Management System
+      </p>
+
+      {/* Grid Pattern Background */}
+      <div className="grid-pattern"></div>
+      
+      {/* Glowing Dots */}
+      <div className="glowing-dot blue-dot"></div>
+      <div className="glowing-dot red-dot"></div>
+      
+      {/* Action Buttons */}
       {user ? (
-        <div style={{ marginTop: '40px' }}>
-          <Link to="/documents" className="btn btn-primary" style={{ marginRight: '20px' }}>
+        <div className="action-buttons">
+          <Link to="/documents" className="btn btn-primary">
             📁 View Documents
           </Link>
           <Link to="/add-document" className="btn btn-secondary">
@@ -19,8 +44,8 @@ const Home = ({ user }) => {
           </Link>
         </div>
       ) : (
-        <div style={{ marginTop: '40px' }}>
-          <Link to="/login" className="btn btn-primary" style={{ marginRight: '20px' }}>
+        <div className="action-buttons">
+          <Link to="/login" className="btn btn-primary">
             🔑 Get Started
           </Link>
           <Link to="/register" className="btn btn-secondary">
@@ -28,40 +53,6 @@ const Home = ({ user }) => {
           </Link>
         </div>
       )}
-
-      <div className="home-features">
-        <div className="feature-card">
-          <div className="feature-icon">🔒</div>
-          <h3 className="feature-title">Secure Storage</h3>
-          <p className="feature-description">
-            Your documents are encrypted and stored securely in the cloud with enterprise-grade security.
-          </p>
-        </div>
-        
-        <div className="feature-card">
-          <div className="feature-icon">⚡</div>
-          <h3 className="feature-title">Lightning Fast</h3>
-          <p className="feature-description">
-            Upload and access your documents instantly with our optimized cloud infrastructure.
-          </p>
-        </div>
-        
-        <div className="feature-card">
-          <div className="feature-icon">🌐</div>
-          <h3 className="feature-title">Access Anywhere</h3>
-          <p className="feature-description">
-            Access your documents from any device, anywhere in the world with our responsive web app.
-          </p>
-        </div>
-        
-        <div className="feature-card">
-          <div className="feature-icon">📊</div>
-          <h3 className="feature-title">Smart Organization</h3>
-          <p className="feature-description">
-            Automatically organize and categorize your documents for easy searching and management.
-          </p>
-        </div>
-      </div>
     </div>
   );
 };
