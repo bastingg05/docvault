@@ -18,7 +18,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // MongoDB Atlas Connection
-const MONGODB_URI = 'mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault-v2?retryWrites=true&w=majority&appName=Bastin0';
+const MONGODB_URI = process.env.MONGO_URI || 'mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault-v2?retryWrites=true&w=majority&appName=Bastin0';
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -112,7 +112,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: 'Authentication token required' });
   }
 
-  jwt.verify(token, 'your-super-secret-jwt-key-change-this-in-production', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production', (err, user) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
@@ -153,7 +153,7 @@ app.post('/api/users/login', async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      'your-super-secret-jwt-key-change-this-in-production',
+      process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
       { expiresIn: '24h' }
     );
 
@@ -199,7 +199,7 @@ app.post('/api/users/register', async (req, res) => {
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
-      'your-super-secret-jwt-key-change-this-in-production',
+      process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-this-in-production',
       { expiresIn: '24h' }
     );
 
