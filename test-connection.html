@@ -4,54 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>API Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        pre {
+            background: #333;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>DocuVault API Connection Test</h1>
-    <div id="results"></div>
+    <h1>🔧 API Connection Test</h1>
     
+    <div class="test-section">
+        <h2>Backend Health Check</h2>
+        <button onclick="testHealth()">Test Health Endpoint</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>User Registration Test</h2>
+        <button onclick="testRegister()">Test Registration</button>
+        <div id="register-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>User Login Test</h2>
+        <button onclick="testLogin()">Test Login</button>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Documents API Test</h2>
+        <button onclick="testDocuments()">Test Documents</button>
+        <div id="documents-result"></div>
+    </div>
+
     <script>
-        const resultsDiv = document.getElementById('results');
+        const API_BASE = 'http://localhost:5000';
         
-        async function testConnection() {
+        async function testHealth() {
+            const resultDiv = document.getElementById('health-result');
+            resultDiv.innerHTML = '<p class="info">Testing...</p>';
+            
             try {
-                // Test backend health endpoint
-                const healthResponse = await fetch('http://localhost:5000/health');
-                const healthData = await healthResponse.json();
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
                 
-                resultsDiv.innerHTML += `
-                    <h3>✅ Backend Health Check</h3>
-                    <p>Status: ${healthData.status}</p>
-                    <p>Database: ${healthData.database}</p>
-                    <p>Uptime: ${Math.floor(healthData.uptime / 1000)}s</p>
-                `;
-                
-                // Test user routes
-                const userResponse = await fetch('http://localhost:5000/api/users');
-                const userData = await userResponse.json();
-                
-                resultsDiv.innerHTML += `
-                    <h3>✅ User Routes Test</h3>
-                    <p>Message: ${userData.message}</p>
-                    <p>Timestamp: ${userData.timestamp}</p>
-                `;
-                
-                // Test CORS
-                resultsDiv.innerHTML += `
-                    <h3>✅ CORS Test</h3>
-                    <p>CORS headers present: ${healthResponse.headers.get('Access-Control-Allow-Origin') ? 'Yes' : 'No'}</p>
-                `;
-                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Health check successful!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Health check failed: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
             } catch (error) {
-                resultsDiv.innerHTML += `
-                    <h3>❌ Connection Error</h3>
-                    <p>Error: ${error.message}</p>
-                    <p>This indicates a network connectivity issue between frontend and backend.</p>
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Connection error: ${error.message}</p>
                 `;
             }
         }
-        
-        // Run test when page loads
-        testConnection();
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('register-result');
+            resultDiv.innerHTML = '<p class="info">Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        password: 'testpass123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Registration successful!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Registration failed: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Connection error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.innerHTML = '<p class="info">Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'bastin123@gmail.com',
+                        password: 'bastin123'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Login successful!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Login failed: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Connection error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testDocuments() {
+            const resultDiv = document.getElementById('documents-result');
+            resultDiv.innerHTML = '<p class="info">Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/documents`);
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Documents API working!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Documents API failed: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Connection error: ${error.message}</p>
+                `;
+            }
+        }
     </script>
 </body>
 </html>
