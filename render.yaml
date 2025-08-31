@@ -23,7 +23,7 @@ services:
     name: docuvault-v2-frontend
     env: static
     plan: free
-    buildCommand: npm run build
+    buildCommand: npm run install-all && npm run build
     publishDirectory: frontend/dist
     envVars:
       - key: VITE_API_URL
