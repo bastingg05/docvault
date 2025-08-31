@@ -55,10 +55,10 @@ const initializeServer = async () => {
   }
 };
 
+const app = express();
+
 // Start the server initialization
 initializeServer();
-
-const app = express();
 
 // Tracking variables
 const startTime = Date.now();

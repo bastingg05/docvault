@@ -12,7 +12,13 @@
     "install-all": "npm install && cd backend && npm install && cd frontend && npm install --production=false",
     "prestart": "npm run build:prod"
   },
-  "keywords": ["documents", "management", "react", "nodejs", "mongodb"],
+  "keywords": [
+    "documents",
+    "management",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
   "author": "Bastin",
   "license": "MIT",
   "dependencies": {
@@ -22,7 +28,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
