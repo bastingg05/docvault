@@ -26,6 +26,8 @@ api.interceptors.request.use(
     config.retryAttempt = config.retryAttempt || 0;
     
     console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+    console.log(`📍 Full URL: ${config.baseURL}${config.url}`);
+    console.log(`🔧 Config:`, config);
     return config;
   },
   (error) => {
