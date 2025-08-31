@@ -1,7 +1,7 @@
 services:
   # Combined Backend + Frontend Service
   - type: web
-    name: docuvault-v2
+    name: docuvault
     env: node
     plan: free
     buildCommand: npm run build:prod

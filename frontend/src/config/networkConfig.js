@@ -106,8 +106,8 @@ export const CACHE_STRATEGIES = {
 
 // Default API endpoints with fallbacks
 export const API_ENDPOINTS = {
-  PRIMARY: 'https://docuvault-v2.onrender.com',
-  FALLBACK: 'https://docuvault-v2.onrender.com', // Same service as fallback
+  PRIMARY: 'https://docuvault.onrender.com',
+  FALLBACK: 'https://docuvault.onrender.com', // Same service as fallback
   LOCAL: 'http://localhost:5000',
   HEALTH: '/health',
   API_BASE: '/api'
