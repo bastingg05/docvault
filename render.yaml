@@ -1,10 +1,10 @@
 services:
-  # Backend Service
+  # Combined Backend + Frontend Service
   - type: web
-    name: docuvault-v2-backend
+    name: docuvault-v2
     env: node
     plan: free
-    buildCommand: npm run install-all
+    buildCommand: npm run install-all && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -16,16 +16,4 @@ services:
       - key: JWT_SECRET
         value: your-super-secret-jwt-key-change-this-in-production
     healthCheckPath: /health
-    autoDeploy: true
-
-  # Frontend Service
-  - type: web
-    name: docuvault-v2-frontend
-    env: static
-    plan: free
-    buildCommand: npm run install-all && npm run build
-    publishDirectory: frontend/dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://docuvault-v2-backend.onrender.com
     autoDeploy: true
