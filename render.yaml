@@ -2,7 +2,7 @@ services:
   - type: web
     name: docuvault-backend
     env: node
-    plan: free
+    plan: starter
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     envVars:
@@ -18,7 +18,7 @@ services:
   - type: web
     name: docuvault-frontend
     env: static
-    plan: free
+    plan: starter
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
