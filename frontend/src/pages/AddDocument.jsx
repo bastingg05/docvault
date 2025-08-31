@@ -1,230 +1,197 @@
-import React, { useState } from "react";
-import { createDocument } from "../services/documentService";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function AddDocument() {
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [fileUrl, setFileUrl] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+const AddDocument = ({ user }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: ''
+  });
+  const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [dragActive, setDragActive] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      if (!formData.title) {
+        setFormData(prev => ({ ...prev, title: selectedFile.name }));
+      }
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const droppedFile = e.dataTransfer.files[0];
+      setFile(droppedFile);
+      if (!formData.title) {
+        setFormData(prev => ({ ...prev, title: droppedFile.name }));
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!file) {
+      setError('Please select a file to upload');
+      setLoading(false);
+      return;
+    }
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB');
+      setLoading(false);
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    if (!allowedTypes.includes(file.type)) {
+      setError('Only image, PDF, and document files are allowed');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const documentData = {
-        title,
-        category,
-        expiryDate: expiryDate || null,
-        fileUrl
-      };
-      
-      await createDocument(documentData);
-      setSuccess("Document added successfully!");
-      setError("");
-      
-      // Clear form
-      setTitle("");
-      setCategory("");
-      setExpiryDate("");
-      setFileUrl("");
-      
-      // Redirect to documents list after 2 seconds
-      setTimeout(() => {
-        navigate("/documents");
-      }, 2000);
-      
-    } catch (err) {
-      console.error("Add document error:", err);
-      setError(err.response?.data?.message || err.message || "Failed to add document");
-      setSuccess("");
+      const token = localStorage.getItem('token');
+      const uploadData = new FormData();
+      uploadData.append('file', file);
+      uploadData.append('title', formData.title);
+      uploadData.append('description', formData.description);
+
+      await axios.post('/api/documents', uploadData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      navigate('/documents');
+    } catch (error) {
+      setError(error.response?.data?.message || 'Failed to upload document');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ 
-      maxWidth: "600px", 
-      margin: "0 auto", 
-      padding: "20px",
-      minHeight: "80vh"
-    }}>
-      <h2 style={{
-        textAlign: "center",
-        margin: "0 0 30px 0",
-        color: "#333",
-        fontSize: "28px"
-      }}>Add New Document</h2>
-      
-      {error && <p style={{ 
-        color: "red", 
-        textAlign: "center",
-        padding: "10px",
-        background: "#ffe6e6",
-        borderRadius: "5px",
-        margin: "0 0 20px 0"
-      }}>{error}</p>}
-      
-      {success && <p style={{ 
-        color: "green", 
-        textAlign: "center",
-        padding: "10px",
-        background: "#e6ffe6",
-        borderRadius: "5px",
-        margin: "0 0 20px 0"
-      }}>{success}</p>}
-      
-      <form onSubmit={handleSubmit} style={{ 
-        display: "flex", 
-        flexDirection: "column", 
-        gap: "20px",
-        background: "white",
-        padding: "30px",
-        borderRadius: "10px",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
-      }}>
-        <div>
-          <label htmlFor="title" style={{
-            display: "block",
-            marginBottom: "8px",
-            fontWeight: "bold",
-            color: "#333"
-          }}>Document Title *</label>
-          <input
-            id="title"
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            style={{ 
-              width: "100%", 
-              padding: "12px", 
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
-          />
-        </div>
+    <div className="add-document-container">
+      <div className="add-document-card">
+        <h1 className="add-document-title">Add New Document</h1>
         
-        <div>
-          <label htmlFor="category" style={{
-            display: "block",
-            marginBottom: "8px",
-            fontWeight: "bold",
-            color: "#333"
-          }}>Category *</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            style={{ 
-              width: "100%", 
-              padding: "12px", 
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
+        {error && <div className="alert alert-error">{error}</div>}
+        
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
+              Document Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Enter document title"
+              style={{ width: '100%' }}
+              required
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
+              Description (Optional)
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Enter document description"
+              style={{ width: '100%', minHeight: '100px', resize: 'vertical' }}
+            />
+          </div>
+
+          <div 
+            className={`file-upload-area ${dragActive ? 'dragover' : ''}`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+            onClick={() => document.getElementById('file-input').click()}
           >
-            <option value="">Select a category</option>
-            <option value="Personal">Personal</option>
-            <option value="Work">Work</option>
-            <option value="Financial">Financial</option>
-            <option value="Legal">Legal</option>
-            <option value="Medical">Medical</option>
-            <option value="Educational">Educational</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-        
-        <div>
-          <label htmlFor="expiryDate" style={{
-            display: "block",
-            marginBottom: "8px",
-            fontWeight: "bold",
-            color: "#333"
-          }}>Expiry Date (Optional)</label>
-          <input
-            id="expiryDate"
-            type="date"
-            value={expiryDate}
-            onChange={(e) => setExpiryDate(e.target.value)}
-            style={{ 
-              width: "100%", 
-              padding: "12px", 
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor="fileUrl" style={{
-            display: "block",
-            marginBottom: "8px",
-            fontWeight: "bold",
-            color: "#333"
-          }}>File URL *</label>
-          <input
-            id="fileUrl"
-            type="url"
-            placeholder="https://example.com/document.pdf"
-            value={fileUrl}
-            onChange={(e) => setFileUrl(e.target.value)}
-            required
-            style={{ 
-              width: "100%", 
-              padding: "12px", 
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "16px",
-              boxSizing: "border-box"
-            }}
-          />
-        </div>
-        
-        <button 
-          type="submit" 
-          style={{ 
-            padding: "15px", 
-            backgroundColor: "#007bff", 
-            color: "white", 
-            border: "none", 
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
-            marginTop: "10px"
-          }}
-        >
-          Add Document
-        </button>
-      </form>
-      
-      <button 
-        onClick={() => navigate("/documents")}
-        style={{ 
-          marginTop: "20px",
-          padding: "12px 20px", 
-          backgroundColor: "#6c757d", 
-          color: "white", 
-          border: "none", 
-          borderRadius: "5px",
-          cursor: "pointer",
-          fontSize: "16px",
-          display: "block",
-          margin: "20px auto 0 auto"
-        }}
-      >
-        Back to Documents
-      </button>
+            <input
+              id="file-input"
+              type="file"
+              onChange={handleFileChange}
+              style={{ display: 'none' }}
+              accept="image/*,.pdf,.doc,.docx,.txt"
+            />
+            
+            {file ? (
+              <div>
+                <div className="file-upload-icon">✅</div>
+                <div className="file-upload-text">{file.name}</div>
+                <div className="file-upload-hint">
+                  Size: {(file.size / 1024 / 1024).toFixed(2)} MB
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className="file-upload-icon">📁</div>
+                <div className="file-upload-text">Click to select or drag and drop</div>
+                <div className="file-upload-hint">
+                  Supports: Images, PDF, Word documents, Text files (Max 10MB)
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button 
+            type="submit" 
+            className="auth-button"
+            disabled={loading || !file}
+            style={{ width: '100%', marginTop: '20px' }}
+          >
+            {loading ? (
+              <>
+                <span className="loading"></span>
+                Uploading document...
+              </>
+            ) : (
+              'Upload Document'
+            )}
+          </button>
+        </form>
+      </div>
     </div>
   );
-}
+};
 
 export default AddDocument; 

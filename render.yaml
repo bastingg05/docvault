@@ -1,29 +1,27 @@
 services:
-  # Free Backend Service (Web Service with free tier)
+  # Backend Service
   - type: web
-    name: docuvault-backend
+    name: docuvault-v2-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: MONGO_URI
-        sync: false
-      - key: JWT_SECRET
-        sync: false
+      - key: PORT
+        value: 5000
     healthCheckPath: /health
     autoDeploy: true
 
-  # Free Frontend Service (Static Site - always free)
+  # Frontend Service
   - type: web
-    name: docuvault-frontend
+    name: docuvault-v2-frontend
     env: static
     plan: free
     buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    publishDirectory: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://docuvault-backend.onrender.com
+        value: https://docuvault-v2-backend.onrender.com
     autoDeploy: true

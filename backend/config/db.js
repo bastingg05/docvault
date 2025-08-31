@@ -5,13 +5,13 @@ const connectDB = async () => {
     // Try to get MONGO_URI from environment
     let mongoURI = process.env.MONGO_URI;
     
-    // If no MONGO_URI, use a fallback (for demo purposes)
+    // If no MONGO_URI, use local MongoDB
     if (!mongoURI) {
       console.log("⚠️ No MONGO_URI found in environment variables");
-      console.log("🔧 Using fallback MongoDB Atlas connection...");
+      console.log("🔧 Using local MongoDB connection...");
       
-      // Fallback to hardcoded URI (temporary solution)
-      mongoURI = "mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0";
+      // Use local MongoDB instance
+      mongoURI = "mongodb://localhost:27017/docuvault";
     }
 
     console.log("🔗 Attempting MongoDB connection...");
@@ -21,7 +21,6 @@ const connectDB = async () => {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
-      bufferCommands: false,
     });
     
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);

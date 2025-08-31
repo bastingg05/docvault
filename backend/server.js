@@ -16,14 +16,47 @@ console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
 
 // Connect to MongoDB - Updated for local development
 let dbConnected = false;
-connectDB().then(connected => {
-  dbConnected = connected;
-  if (connected) {
-    console.log("🚀 Database connection established successfully");
-  } else {
-    console.log("⚠️ Running in demo mode without database connection");
+
+// Initialize database connection
+const initializeServer = async () => {
+  try {
+    dbConnected = await connectDB();
+    if (dbConnected) {
+      console.log("🚀 Database connection established successfully");
+    } else {
+      console.log("⚠️ Running in demo mode without database connection");
+    }
+    
+    // Start server only after database connection attempt
+    if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
+      const PORT = process.env.PORT || 5000;
+      const server = app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`🌐 Health check available at: http://localhost:${PORT}/health`);
+        console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Demo Mode'}`);
+        console.log(`🔗 Frontend should connect to: http://localhost:${PORT}`);
+      });
+
+      // Server error handling
+      server.on('error', (error) => {
+        console.error('💥 Server error:', error);
+        if (error.code === 'EADDRINUSE') {
+          console.error(`Port ${PORT} is already in use`);
+          process.exit(1);
+        }
+      });
+    } else {
+      console.log('🚀 Running in Vercel production mode');
+    }
+  } catch (error) {
+    console.error('💥 Failed to initialize server:', error);
+    process.exit(1);
   }
-});
+};
+
+// Start the server initialization
+initializeServer();
 
 const app = express();
 
@@ -188,27 +221,6 @@ setInterval(() => {
   }
 }, 60000); // Check every minute
 
-// Start server only in local development
-if (process.env.NODE_ENV !== 'production' || process.env.VERCEL !== '1') {
-  const PORT = process.env.PORT || 5000;
-  const server = app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`🌐 Health check available at: http://localhost:${PORT}/health`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`💾 Database: ${dbConnected ? 'Connected' : 'Demo Mode'}`);
-    console.log(`🔗 Frontend should connect to: http://localhost:${PORT}`);
-  });
-
-  // Server error handling
-  server.on('error', (error) => {
-    console.error('💥 Server error:', error);
-    if (error.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is already in use`);
-      process.exit(1);
-    }
-  });
-} else {
-  console.log('🚀 Running in Vercel production mode');
-}
+// Server startup is now handled in initializeServer() function above
 
 export default app;

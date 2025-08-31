@@ -1,100 +1,126 @@
-import React, { useState } from "react";
-import { registerUser } from "../services/userService";
-import { useNavigate, Link } from "react-router-dom";
-import "../styles/auth.css";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-function Register() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+const Register = ({ onLogin }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    
+    setLoading(true);
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const user = await registerUser(name, email, password);
-      console.log("Registered:", user);
-      // Dispatch custom event to update login state
-      window.dispatchEvent(new Event('loginStateChanged'));
-      // Redirect to documents page after successful registration
-      navigate("/documents");
-    } catch (err) {
-      console.error("Registration error:", err);
-      setError(err.response?.data?.message || err.message || "Registration failed");
+      const response = await axios.post('/api/users/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+      onLogin(response.data.user, response.data.token);
+    } catch (error) {
+      setError(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <div className="auth-back-home">
-        <Link to="/" className="auth-home-link">
-          ← Back to Home
-        </Link>
-      </div>
-      
-      <form onSubmit={handleSubmit} className="auth-form">
-        <h2 className="auth-title">Create Account</h2>
-        <p className="auth-subtitle">Join DocuVault and start managing your documents</p>
+      <div className="auth-card">
+        <h1 className="auth-title">Create Account</h1>
+        <p className="auth-subtitle">Join DocuVault V2 and start managing your documents</p>
         
-        {error && <p className="auth-error">{error}</p>}
+        {error && <div className="alert alert-error">{error}</div>}
         
-        <div className="auth-input-group">
+        <form className="auth-form" onSubmit={handleSubmit}>
           <input
             type="text"
+            name="name"
             placeholder="Full name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={formData.name}
+            onChange={handleChange}
             className="auth-input"
             required
-            disabled={isLoading}
           />
-        </div>
-        
-        <div className="auth-input-group">
+          
           <input
             type="email"
+            name="email"
             placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formData.email}
+            onChange={handleChange}
             className="auth-input"
             required
-            disabled={isLoading}
           />
-        </div>
-        
-        <div className="auth-input-group">
+          
           <input
             type="password"
-            placeholder="Create password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+            name="password"
+            placeholder="Password (min 6 characters)"
+            value={formData.password}
+            onChange={handleChange}
             className="auth-input"
-            disabled={isLoading}
+            required
           />
-        </div>
+          
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="auth-input"
+            required
+          />
+          
+          <button 
+            type="submit" 
+            className="auth-button"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="loading"></span>
+                Creating account...
+              </>
+            ) : (
+              'Create Account'
+            )}
+          </button>
+        </form>
         
-        <button 
-          type="submit" 
-          className={`auth-button ${isLoading ? 'loading' : ''}`}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Creating Account...' : 'Create Account'}
-        </button>
-        
-        <p className="auth-link">
-          Already have an account? <Link to="/login">Sign in here</Link>
-        </p>
-      </form>
+        <Link to="/login" className="auth-link">
+          Already have an account? Sign in
+        </Link>
+      </div>
     </div>
   );
-}
+};
 
 export default Register;

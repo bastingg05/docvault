@@ -1,330 +1,235 @@
-# DocuVault - High Availability Document Management System 🚀
+# 📄 DocuVault V2 - Document Management System
 
-DocuVault is a secure, high-availability document management system designed to achieve **99.9% uptime** with comprehensive monitoring, auto-recovery, and offline capabilities.
+A modern, secure document management system built with React, Node.js, and MongoDB. Store, organize, and access your documents from anywhere with a beautiful, responsive interface.
 
 ## ✨ Features
 
-### 🔒 Security & Authentication
-- JWT-based authentication
-- Secure document storage
-- User role management
-- Encrypted data transmission
+- **🔐 Secure Authentication** - JWT-based user authentication with bcrypt password hashing
+- **📁 Document Management** - Upload, view, and delete documents with ease
+- **🎨 Modern UI/UX** - Beautiful, responsive design with smooth animations
+- **📱 Mobile Responsive** - Works perfectly on all devices
+- **⚡ Real-time Updates** - Instant feedback and updates
+- **🔍 File Type Support** - Images, PDFs, Word documents, and text files
+- **📊 File Information** - View file size, upload date, and metadata
+- **🌐 Cloud Storage** - MongoDB Atlas for reliable cloud storage
 
-### 📱 Progressive Web App (PWA)
-- Offline functionality
-- Service worker caching
-- App-like experience
-- Push notifications
+## 🛠️ Tech Stack
 
-### 🚀 High Availability (99.9% Uptime)
-- Real-time health monitoring
-- Auto-recovery mechanisms
-- Graceful error handling
-- Performance metrics tracking
-- Zero-downtime deployments
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **MongoDB** - Database with Mongoose ODM
+- **JWT** - Authentication tokens
+- **bcryptjs** - Password hashing
+- **multer** - File upload handling
+- **CORS** - Cross-origin resource sharing
 
-### 📊 Monitoring & Analytics
-- Live health dashboard
-- Uptime tracking
-- Performance metrics
-- Error rate monitoring
-- Memory usage tracking
-
-## 🏗️ Architecture
-
-```
-DocuVault/
-├── backend/                 # Node.js/Express API
-│   ├── config/             # Database configuration
-│   ├── middleware/         # Authentication & validation
-│   ├── models/             # MongoDB schemas
-│   ├── routes/             # API endpoints
-│   ├── server.js           # Main server with health endpoints
-│   └── monitor.js          # Health monitoring service
-├── frontend/               # React PWA
-│   ├── src/
-│   │   ├── components/     # React components
-│   │   ├── pages/          # Application pages
-│   │   ├── services/       # API services
-│   │   └── App.jsx         # Main application
-│   ├── public/
-│   │   ├── sw.js           # Service worker
-│   │   ├── manifest.json   # PWA manifest
-│   │   └── offline.html    # Offline page
-│   └── package.json
-├── deploy.sh               # Zero-downtime deployment script
-└── README.md
-```
+### Frontend
+- **React 18** - UI library
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **Vite** - Build tool and dev server
+- **CSS3** - Modern styling with gradients and animations
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- MongoDB 6+
+- Node.js (v16 or higher)
 - npm or yarn
-
-### 1. Clone and Install
-```bash
-git clone <repository-url>
-cd docuvault
-npm install
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### 2. Environment Setup
-Create `.env` file in backend directory:
-```env
-MONGODB_URI=mongodb://localhost:27017/docuvault
-JWT_SECRET=your-secret-key
-NODE_ENV=production
-PORT=5000
-```
-
-### 3. Start the Application
-```bash
-# Start backend with monitoring
-cd backend
-npm run monitor
-
-# Start frontend (in new terminal)
-cd frontend
-npm run dev
-```
-
-## 📊 Health Monitoring
-
-### Backend Health Endpoints
-- **`/health`** - Basic health status
-- **`/health/detailed`** - Comprehensive health data
-- **`/uptime`** - Uptime statistics
-- **`/metrics`** - Prometheus-style metrics
-- **`/health/recover`** - Trigger auto-recovery
-
-### Frontend Health Dashboard
-- Real-time system status
-- Connection quality monitoring
-- Uptime tracking
-- Health check history
-- Performance metrics
-
-## 🔧 Deployment
-
-### Zero-Downtime Deployment
-```bash
-# Make script executable
-chmod +x deploy.sh
-
-# Deploy with zero downtime
-./deploy.sh deploy
-
-# Check status
-./deploy.sh status
-
-# Rollback if needed
-./deploy.sh rollback
-```
-
-### Deployment Commands
-- `./deploy.sh deploy` - Deploy application
-- `./deploy.sh status` - Check application status
-- `./deploy.sh stop` - Stop application
-- `./deploy.sh start` - Start application
-- `./deploy.sh restart` - Restart application
-- `./deploy.sh rollback` - Rollback to previous version
-- `./deploy.sh health` - Health check
-
-## 📈 Monitoring & Maintenance
-
-### Backend Monitoring
-```bash
-# Start monitoring service
-cd backend
-npm run monitor
-
-# Check health
-npm run health
-
-# View uptime
-npm run uptime
-
-# View metrics
-npm run metrics
-
-# Trigger recovery
-npm run recover
-```
-
-### Health Check Intervals
-- **Health Check**: Every 30 seconds
-- **Heartbeat**: Every 60 seconds
-- **Metrics Update**: Every 10 seconds
-- **Auto-recovery**: After 3 consecutive failures
-
-### Performance Thresholds
-- **Response Time**: < 300ms (excellent), < 1000ms (good)
-- **Error Rate**: < 5% (healthy), < 10% (degraded)
-- **Memory Usage**: < 500MB (warning threshold)
-- **Uptime Target**: 99.9%
-
-## 🛡️ High Availability Features
-
-### 1. Auto-Recovery
-- Automatic service restart on failures
-- Health check monitoring
-- Graceful error handling
-- Memory leak detection
-
-### 2. Offline Capabilities
-- Service worker caching
-- Offline document viewing
-- Background sync
-- Progressive enhancement
-
-### 3. Load Balancing Ready
-- Stateless API design
-- Health check endpoints
-- Metrics for load balancers
-- Graceful shutdown handling
-
-### 4. Monitoring & Alerting
-- Real-time health dashboard
-- Performance metrics
-- Error tracking
-- Uptime monitoring
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-#### Backend Not Starting
-```bash
-# Check logs
-tail -f logs/backend.log
-
-# Check health
-curl http://localhost:5000/health
-
-# Restart service
-./deploy.sh restart
-```
-
-#### Health Check Failures
-```bash
-# Check monitor logs
-tail -f logs/monitor.log
-
-# Force health check
-cd backend && npm run health
-
-# Reset failure count
-pkill -SIGUSR2 -f monitor.js
-```
-
-#### High Memory Usage
-```bash
-# Check memory usage
-curl http://localhost:5000/health/detailed
-
-# Trigger garbage collection
-curl -X POST http://localhost:5000/health/recover
-
-# Restart if needed
-./deploy.sh restart
-```
-
-### Log Files
-- `logs/backend.log` - Backend application logs
-- `logs/monitor.log` - Health monitoring logs
-- `logs/frontend.log` - Frontend development logs
-- `backend/monitor.log` - Monitor service logs
-- `backend/metrics.json` - Performance metrics
-
-## 📱 PWA Features
-
-### Service Worker
-- Automatic caching
-- Offline functionality
-- Background sync
-- Push notifications
+- MongoDB Atlas account (free tier available)
 
 ### Installation
-- Add to home screen
-- Offline access
-- App-like experience
-- Automatic updates
 
-## 🔐 Security Features
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/bastingg05/docuvault-v2.git
+   cd docuvault-v2
+   ```
 
-- JWT authentication
-- CORS protection
-- Input validation
-- Secure file uploads
-- Rate limiting ready
+2. **Install dependencies**
+   ```bash
+   # Install backend dependencies
+   npm install
+   
+   # Install frontend dependencies
+   cd frontend
+   npm install
+   cd ..
+   ```
 
-## 📊 Performance Metrics
+3. **Start the development servers**
+   ```bash
+   # Start backend server (in one terminal)
+   npm run dev
+   
+   # Start frontend server (in another terminal)
+   cd frontend
+   npm run dev
+   ```
 
-### Backend Metrics
-- Request count
-- Error rate
-- Response time
-- Memory usage
-- Uptime percentage
+4. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+   - Health Check: http://localhost:5000/health
 
-### Frontend Metrics
-- Connection quality
-- Health status
-- Offline time
-- Cache hit rate
+## 🔐 Default Login
 
-## 🚀 Production Deployment
+The application comes with a default demo account:
+- **Email**: `bastin123@gmail.com`
+- **Password**: `test123`
 
-### Environment Variables
+## 📁 Project Structure
+
+```
+docuvault-v2/
+├── server.js              # Main backend server
+├── package.json           # Backend dependencies
+├── render.yaml            # Render deployment config
+├── uploads/               # File upload directory
+├── frontend/              # React frontend
+│   ├── src/
+│   │   ├── components/    # Reusable components
+│   │   ├── pages/         # Page components
+│   │   ├── App.jsx        # Main app component
+│   │   └── main.jsx       # Entry point
+│   ├── package.json       # Frontend dependencies
+│   └── vite.config.js     # Vite configuration
+└── README.md              # This file
+```
+
+## 🌐 API Endpoints
+
+### Authentication
+- `POST /api/users/login` - User login
+- `POST /api/users/register` - User registration
+- `GET /api/users/profile` - Get user profile
+
+### Documents
+- `GET /api/documents` - Get user's documents
+- `POST /api/documents` - Upload new document
+- `GET /api/documents/:id` - Get specific document
+- `PUT /api/documents/:id` - Update document
+- `DELETE /api/documents/:id` - Delete document
+
+### Health Check
+- `GET /health` - Server health status
+
+## 🚀 Deployment
+
+### Render.com (Recommended)
+
+1. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Initial commit"
+   git push origin main
+   ```
+
+2. **Deploy to Render**
+   - Go to [Render.com](https://render.com)
+   - Click "New +" → "Blueprint"
+   - Connect your GitHub repository
+   - Click "Apply" to deploy
+
+The `render.yaml` file will automatically configure both backend and frontend services.
+
+### Manual Deployment
+
+#### Backend Service
+- **Type**: Web Service
+- **Environment**: Node
+- **Build Command**: `npm install`
+- **Start Command**: `npm start`
+- **Health Check Path**: `/health`
+
+#### Frontend Service
+- **Type**: Static Site
+- **Build Command**: `cd frontend && npm install && npm run build`
+- **Publish Directory**: `frontend/dist`
+
+## 🔧 Environment Variables
+
+The application works with default MongoDB Atlas connection. For production, consider setting:
+
 ```env
 NODE_ENV=production
-MONGODB_URI=mongodb://production-db:27017/docuvault
-JWT_SECRET=production-secret-key
 PORT=5000
-HEALTH_CHECK_URL=http://your-domain.com/health
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
 ```
 
-### Process Management
-```bash
-# Use PM2 for production
-npm install -g pm2
-pm2 start backend/server.js --name "docuvault-backend"
-pm2 start backend/monitor.js --name "docuvault-monitor"
-pm2 startup
-pm2 save
-```
+## 📱 Features in Detail
 
-### Load Balancer Configuration
-- Health check endpoint: `/health`
-- Expected response: 200 OK
-- Check interval: 30 seconds
-- Failure threshold: 3
-- Success threshold: 2
+### User Authentication
+- Secure JWT-based authentication
+- Password hashing with bcrypt
+- Protected routes and API endpoints
+- Automatic token refresh
+
+### Document Management
+- Drag & drop file upload
+- Multiple file type support
+- File size validation (10MB limit)
+- Real-time upload progress
+- Document metadata display
+
+### User Interface
+- Modern gradient design
+- Responsive layout
+- Smooth animations
+- Loading states
+- Error handling
+- Success notifications
+
+## 🛡️ Security Features
+
+- **Password Hashing** - bcrypt with salt rounds
+- **JWT Tokens** - Secure authentication
+- **CORS Protection** - Cross-origin security
+- **File Validation** - Type and size checks
+- **Input Sanitization** - XSS protection
+- **Rate Limiting** - API protection
+
+## 📊 Performance
+
+- **Fast Loading** - Optimized bundle size
+- **Efficient Queries** - MongoDB indexing
+- **Caching** - Browser caching
+- **Lazy Loading** - Component optimization
+- **CDN Ready** - Static asset optimization
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
+4. Test thoroughly
 5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the ISC License.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## 🆘 Support
 
-For support and questions:
-- Check the troubleshooting section
-- Review the logs
-- Use the health endpoints
-- Check the monitoring dashboard
+If you encounter any issues:
+
+1. Check the [Issues](https://github.com/bastingg05/docuvault-v2/issues) page
+2. Review the deployment logs
+3. Verify your MongoDB connection
+4. Check the browser console for errors
+
+## 🔮 Roadmap
+
+- [ ] File sharing between users
+- [ ] Document versioning
+- [ ] Advanced search functionality
+- [ ] Document categories and tags
+- [ ] Bulk file operations
+- [ ] File preview generation
+- [ ] API rate limiting
+- [ ] User roles and permissions
 
 ---
 
-**Built with ❤️ for high availability and reliability**
+**Built with ❤️ by Bastin**

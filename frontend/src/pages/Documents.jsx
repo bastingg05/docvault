@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getDocuments, deleteDocument } from '../services/documentService';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-const Documents = () => {
+const Documents = ({ user }) => {
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchDocuments();
@@ -13,9 +13,15 @@ const Documents = () => {
 
   const fetchDocuments = async () => {
     try {
-      const docs = await getDocuments();
-      setDocuments(docs);
+      const token = localStorage.getItem('token');
+      const response = await axios.get('/api/documents', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setDocuments(response.data);
     } catch (error) {
+      setError('Failed to load documents');
       console.error('Error fetching documents:', error);
     } finally {
       setLoading(false);
@@ -23,161 +29,122 @@ const Documents = () => {
   };
 
   const handleDelete = async (documentId) => {
-    if (window.confirm('Are you sure you want to delete this document?')) {
-      try {
-        await deleteDocument(documentId);
-        setDocuments(documents.filter(doc => (doc._id || doc.id) !== documentId));
-      } catch (error) {
-        console.error('Error deleting document:', error);
-      }
+    if (!window.confirm('Are you sure you want to delete this document?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`/api/documents/${documentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setDocuments(documents.filter(doc => doc._id !== documentId));
+    } catch (error) {
+      setError('Failed to delete document');
+      console.error('Error deleting document:', error);
     }
   };
 
-  const handleAddDocument = () => {
-    navigate('/add-document');
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getFileIcon = (fileType) => {
+    if (fileType.includes('image')) return '🖼️';
+    if (fileType.includes('pdf')) return '📄';
+    if (fileType.includes('word') || fileType.includes('document')) return '📝';
+    if (fileType.includes('text')) return '📄';
+    return '📁';
   };
 
   if (loading) {
-    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading...</div>;
+    return (
+      <div className="documents-container">
+        <div className="loading-container">
+          <div className="loading"></div>
+          <p>Loading your documents...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        marginBottom: '30px',
-        padding: '20px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        borderRadius: '15px',
-        color: 'white'
-      }}>
-        <h1>My Documents</h1>
-        <button
-          onClick={handleAddDocument}
-          style={{
-            background: 'rgba(255,255,255,0.2)',
-            color: 'white',
-            border: '2px solid rgba(255,255,255,0.3)',
-            padding: '12px 24px',
-            borderRadius: '25px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '500',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.background = 'rgba(255,255,255,0.3)';
-            e.target.style.transform = 'translateY(-2px)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.background = 'rgba(255,255,255,0.2)';
-            e.target.style.transform = 'translateY(0)';
-          }}
-        >
+    <div className="documents-container">
+      <div className="documents-header">
+        <h1 className="documents-title">My Documents</h1>
+        <Link to="/add-document" className="btn btn-primary">
           ➕ Add Document
-        </button>
+        </Link>
       </div>
 
+      {error && <div className="alert alert-error">{error}</div>}
+
       {documents.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '60px 20px',
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '15px',
-          border: '2px dashed rgba(255,255,255,0.2)'
-        }}>
-          <div style={{ fontSize: '4rem', marginBottom: '20px' }}>📁</div>
-          <h3 style={{ marginBottom: '15px', color: '#666' }}>No Documents Yet</h3>
-          <p style={{ color: '#888', marginBottom: '30px' }}>
-            Start by adding your first document to get organized
+        <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <div style={{ fontSize: '64px', marginBottom: '20px' }}>📁</div>
+          <h2 style={{ marginBottom: '16px', color: '#333' }}>No documents yet</h2>
+          <p style={{ marginBottom: '30px', color: '#666' }}>
+            Start by uploading your first document to get organized.
           </p>
-          <button
-            onClick={handleAddDocument}
-            style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              color: 'white',
-              border: 'none',
-              padding: '15px 30px',
-              borderRadius: '25px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '500',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'translateY(-2px)';
-              e.target.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'translateY(0)';
-              e.target.style.boxShadow = 'none';
-            }}
-          >
-            Add Your First Document
-          </button>
+          <Link to="/add-document" className="btn btn-primary">
+            Upload Your First Document
+          </Link>
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '20px'
-        }}>
-          {documents.map((doc) => (
-            <div
-              key={doc._id || doc.id}
-              style={{
-                background: 'white',
-                borderRadius: '15px',
-                padding: '20px',
-                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease',
-                border: '1px solid #eee'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-5px)';
-                e.target.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
-              }}
-            >
-              <div style={{ marginBottom: '15px' }}>
-                <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{doc.title}</h3>
-                <p style={{ margin: '0', color: '#666', fontSize: '14px' }}>{doc.description}</p>
+        <div className="documents-grid">
+          {documents.map((document) => (
+            <div key={document._id} className="document-card">
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
+                <span style={{ fontSize: '24px', marginRight: '12px' }}>
+                  {getFileIcon(document.fileType)}
+                </span>
+                <h3 className="document-title">{document.title}</h3>
               </div>
               
-              <div style={{ marginBottom: '20px' }}>
-                <span style={{ color: "#666", marginLeft: "5px" }}>{doc.category || 'General'}</span>
-                <span style={{ color: "#666", marginLeft: "5px" }}>{new Date(doc.uploadDate || doc.createdAt).toLocaleDateString()}</span>
+              {document.description && (
+                <p className="document-description">{document.description}</p>
+              )}
+              
+              <div className="document-meta">
+                <span>{formatFileSize(document.fileSize)}</span>
+                <span>{formatDate(document.createdAt)}</span>
               </div>
               
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#888', fontSize: '14px' }}>{doc.size}</span>
-                <button
-                  onClick={() => handleDelete(doc._id || doc.id)}
-                  style={{
-                    background: '#ff6b6b',
-                    color: 'white',
-                    border: 'none',
-                    padding: '8px 16px',
-                    borderRadius: '20px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = '#ff5252';
-                    e.target.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = '#ff6b6b';
-                    e.target.style.transform = 'scale(1)';
-                  }}
+              <div className="document-actions">
+                <button 
+                  className="btn btn-secondary"
+                  style={{ fontSize: '14px', padding: '8px 16px' }}
+                  onClick={() => window.open(`/uploads/${document.fileName}`, '_blank')}
                 >
-                  Delete
+                  👁️ View
+                </button>
+                <button 
+                  className="btn"
+                  style={{ 
+                    fontSize: '14px', 
+                    padding: '8px 16px',
+                    background: '#ff4757',
+                    color: 'white'
+                  }}
+                  onClick={() => handleDelete(document._id)}
+                >
+                  🗑️ Delete
                 </button>
               </div>
             </div>
