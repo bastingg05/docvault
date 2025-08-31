@@ -1,0 +1,19 @@
+{
+  "name": "docuvault-api",
+  "version": "1.0.0",
+  "description": "DocuVault API functions for Vercel",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["docuvault", "api", "vercel", "serverless"],
+  "author": "",
+  "license": "ISC"
+}
