@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: docvault-backend
+    name: docuvault-backend
     env: node
     plan: free
     buildCommand: cd backend && npm install
@@ -9,8 +9,19 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGO_URI
-        value: mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0
+        sync: false
       - key: JWT_SECRET
-        value: your-super-secret-jwt-key-change-this-in-production
+        sync: false
     healthCheckPath: /health
+    autoDeploy: true
+
+  - type: web
+    name: docuvault-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://docuvault-backend.onrender.com
     autoDeploy: true
