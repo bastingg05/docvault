@@ -28,6 +28,8 @@ api.interceptors.request.use(
     console.log(`🌐 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     console.log(`📍 Full URL: ${config.baseURL}${config.url}`);
     console.log(`🔧 Config:`, config);
+    console.log(`🌍 Origin: ${window.location.origin}`);
+    console.log(`🔗 Target: ${config.baseURL}`);
     return config;
   },
   (error) => {
@@ -45,8 +47,17 @@ api.interceptors.response.use(
   async (error) => {
     const { config, response, message } = error;
     
-    // Log the error
-    console.warn(`⚠️ API Error: ${response?.status || 'Network'} - ${message}`);
+    // Log the error with more details
+    console.error(`❌ API Error: ${response?.status || 'Network'} - ${message}`);
+    console.error('Full error object:', error);
+    
+    if (error.code === 'ERR_NETWORK') {
+      console.error('🌐 Network Error - Check if backend is running on http://localhost:5000');
+    }
+    
+    if (error.code === 'ERR_CORS') {
+      console.error('🚫 CORS Error - Check CORS configuration');
+    }
     
     // Handle authentication errors
     if (response?.status === 401) {
