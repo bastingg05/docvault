@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loginUser } from '../services/userService';
+import API from '../api';
 
 const Login = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -9,12 +10,25 @@ const Login = ({ onLogin }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [apiStatus, setApiStatus] = useState('');
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  const testApiConnection = async () => {
+    setApiStatus('Testing...');
+    try {
+      const response = await API.get('/health');
+      setApiStatus(`✅ API Connected! Status: ${response.status}`);
+      console.log('API Response:', response.data);
+    } catch (error) {
+      setApiStatus(`❌ API Failed: ${error.message}`);
+      console.error('API Test Error:', error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -37,6 +51,34 @@ const Login = ({ onLogin }) => {
       <div className="auth-card">
         <h1 className="auth-title">Welcome Back</h1>
         <p className="auth-subtitle">Sign in to access your documents</p>
+        
+        {/* API Test Button */}
+        <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+          <button 
+            type="button" 
+            onClick={testApiConnection}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Test API Connection
+          </button>
+          {apiStatus && (
+            <div style={{ 
+              marginTop: '10px', 
+              fontSize: '12px', 
+              color: apiStatus.includes('✅') ? '#28a745' : '#dc3545' 
+            }}>
+              {apiStatus}
+            </div>
+          )}
+        </div>
         
         {error && <div className="alert alert-error">{error}</div>}
         
