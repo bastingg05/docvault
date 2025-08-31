@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userroutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
+import Document from "./models/Document.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -161,6 +162,31 @@ app.get("/", (req, res) => {
 // API routes
 app.use("/api/users", userRoutes);
 app.use("/api/documents", documentRoutes);
+
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// Test route to create a sample document (for development only)
+if (process.env.NODE_ENV === 'development') {
+  app.post("/api/test/create-document", async (req, res) => {
+    try {
+      const testDoc = await Document.create({
+        title: "Sample Document",
+        category: "Test",
+        expiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+        fileUrl: "/uploads/sample.pdf",
+        fileName: "sample.pdf",
+        fileSize: 1024,
+        fileType: "application/pdf",
+        description: "This is a test document for development purposes",
+        uploadedBy: "507f1f77bcf86cd799439011" // Mock user ID for testing
+      });
+      res.status(201).json(testDoc);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+}
 
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
