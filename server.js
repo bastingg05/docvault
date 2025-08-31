@@ -79,7 +79,6 @@ async function connectDB() {
       maxPoolSize: 10,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      bufferCommands: false,
     });
     console.log('✅ MongoDB Connected Successfully!');
 
