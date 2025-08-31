@@ -1,19 +1,22 @@
 [build]
-  command = "cd backend && npm install"
+  command = "cd frontend && npm install && npm run build"
   publish = "frontend/dist"
-  functions = "backend"
 
 [build.environment]
-  NODE_ENV = "production"
-  MONGO_URI = "mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0"
-  JWT_SECRET = "your-super-secret-jwt-key-change-this-in-production"
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/server/:splat"
+  to = "https://docuvault-backend.onrender.com/api/:splat"
   status = 200
+  force = true
 
 [[redirects]]
-  from = "/health"
-  to = "/.netlify/functions/server/health"
+  from = "/*"
+  to = "/index.html"
   status = 200
+
+[dev]
+  command = "cd frontend && npm run dev"
+  port = 3000
+  publish = "frontend/dist"

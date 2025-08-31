@@ -1,8 +1,9 @@
 services:
+  # Free Backend Service (Web Service with free tier)
   - type: web
     name: docuvault-backend
     env: node
-    plan: starter
+    plan: free
     buildCommand: cd backend && npm install
     startCommand: cd backend && npm start
     envVars:
@@ -15,10 +16,9 @@ services:
     healthCheckPath: /health
     autoDeploy: true
 
-  - type: web
+  # Free Frontend Service (Static Site - always free)
+  - type: static
     name: docuvault-frontend
-    env: static
-    plan: starter
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
