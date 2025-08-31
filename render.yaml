@@ -17,8 +17,10 @@ services:
     autoDeploy: true
 
   # Free Frontend Service (Static Site - always free)
-  - type: static
+  - type: web
     name: docuvault-frontend
+    env: static
+    plan: free
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
