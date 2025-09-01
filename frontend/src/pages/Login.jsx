@@ -81,11 +81,7 @@ const Login = ({ onLogin }) => {
           </button>
         </form>
         
-        <p style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-          Demo Account: <br />
-          Email: <strong>bastin123@gmail.com</strong><br />
-          Password: <strong>test123</strong>
-        </p>
+
         
         <Link to="/register" className="auth-link">
           Don't have an account? Sign up

@@ -14,6 +14,9 @@ const Navbar = ({ user, onLogout }) => {
         <div className="navbar-menu">
           {user ? (
             <>
+              <Link to="/" className="navbar-link">
+                🏠 Home
+              </Link>
               <Link to="/documents" className="navbar-link">
                 📁 Documents
               </Link>
@@ -29,6 +32,9 @@ const Navbar = ({ user, onLogout }) => {
             </>
           ) : (
             <>
+              <Link to="/" className="navbar-link">
+                🏠 Home
+              </Link>
               <Link to="/login" className="navbar-link">
                 🔑 Login
               </Link>

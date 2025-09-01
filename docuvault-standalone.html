@@ -28,16 +28,36 @@
         .header {
             text-align: center;
             padding: 40px 0;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(139, 92, 246, 0.1) 50%, rgba(168, 85, 247, 0.1) 100%);
             border-radius: 20px;
             margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
         }
         
         .logo {
             font-size: 48px;
             font-weight: 900;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 50%, #a855f7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -132,7 +152,7 @@
         .btn {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 50%, #a855f7 100%);
             color: white;
             border: none;
             border-radius: 10px;
@@ -145,7 +165,7 @@
         
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
         }
         
         .btn:disabled {
@@ -262,6 +282,70 @@
             margin-bottom: 20px;
         }
         
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #00d4ff 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .feature-card h3 {
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-size: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card p {
+            color: #a0a0a0;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
         .hidden {
             display: none;
         }
@@ -301,10 +385,60 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="logo">DocuVault</h1>
-            <p class="subtitle">Enterprise Document Management System</p>
+        <!-- Navigation -->
+        <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px 0;">
+            <div class="logo" style="font-size: 24px; margin: 0;">DocuVault</div>
+            <div style="display: flex; gap: 20px;">
+                <button class="btn" onclick="showHome()" style="width: auto; padding: 10px 20px; margin: 0;">🏠 Home</button>
+                <button class="btn" onclick="showLogin()" style="width: auto; padding: 10px 20px; margin: 0;">🔐 Login</button>
+                <button class="btn" onclick="showRegister()" style="width: auto; padding: 10px 20px; margin: 0;">📝 Register</button>
+            </div>
+        </nav>
+
+        <!-- Home Section -->
+        <div class="home-section" id="home-section">
+            <div class="header">
+                <h1 class="logo">DocuVault</h1>
+                <p class="subtitle">Enterprise Document Management System</p>
+                <div style="margin-top: 30px;">
+                    <button class="btn" onclick="showLogin()" style="width: auto; padding: 15px 30px; margin: 10px;">🚀 Get Started</button>
+                    <button class="btn" onclick="showFeatures()" style="width: auto; padding: 15px 30px; margin: 10px; background: transparent; border: 2px solid #8b5cf6;">✨ Features</button>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features-grid" id="features-grid" style="display: none;">
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure Storage</h3>
+                    <p>Enterprise-grade security with encrypted document storage and access controls.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Cross-Platform</h3>
+                    <p>Access your documents from any device, anywhere, anytime with our responsive design.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>Optimized performance with instant search and real-time synchronization.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Beautiful UI</h3>
+                    <p>Modern, intuitive interface designed for productivity and user experience.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Smart Search</h3>
+                    <p>Advanced search capabilities with AI-powered document discovery.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Analytics</h3>
+                    <p>Comprehensive insights into your document usage and team collaboration.</p>
+                </div>
+            </div>
         </div>
 
         <!-- Status Grid -->
@@ -329,24 +463,18 @@
         </div>
 
         <!-- Login Section -->
-        <div class="login-section" id="login-section">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #00d4ff;">🔐 Login to DocuVault</h2>
-            
-            <div class="demo-info">
-                <h4>Demo Credentials</h4>
-                <p><strong>Email:</strong> bastin123@gmail.com</p>
-                <p><strong>Password:</strong> test123</p>
-            </div>
+        <div class="login-section hidden" id="login-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #8b5cf6;">🔐 Login to DocuVault</h2>
             
             <form class="login-form" id="login-form">
                 <div class="form-group">
                     <label for="email">Email Address</label>
-                    <input type="email" id="email" name="email" value="bastin123@gmail.com" required>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" value="test123" required>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 </div>
                 
                 <button type="submit" class="btn" id="login-btn">
@@ -354,7 +482,43 @@
                 </button>
             </form>
             
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: #a0a0a0;">Don't have an account? <button onclick="showRegister()" style="background: none; border: none; color: #8b5cf6; cursor: pointer; text-decoration: underline;">Register here</button></p>
+            </div>
+            
             <div id="login-result"></div>
+        </div>
+
+        <!-- Register Section -->
+        <div class="login-section hidden" id="register-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #8b5cf6;">📝 Create Account</h2>
+            
+            <form class="login-form" id="register-form">
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" name="name" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" name="email" placeholder="Enter your email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" name="password" placeholder="Create a password" required>
+                </div>
+                
+                <button type="submit" class="btn" id="register-btn">
+                    <span id="register-text">✨ Create Account</span>
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <p style="color: #a0a0a0;">Already have an account? <button onclick="showLogin()" style="background: none; border: none; color: #8b5cf6; cursor: pointer; text-decoration: underline;">Login here</button></p>
+            </div>
+            
+            <div id="register-result"></div>
         </div>
 
         <!-- Documents Section -->
@@ -396,7 +560,40 @@
         // Check system status on page load
         window.onload = function() {
             checkSystemStatus();
+            showHome();
         };
+
+        // Navigation functions
+        function showHome() {
+            hideAllSections();
+            document.getElementById('home-section').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            hideAllSections();
+            document.getElementById('login-section').classList.remove('hidden');
+        }
+
+        function showRegister() {
+            hideAllSections();
+            document.getElementById('register-section').classList.remove('hidden');
+        }
+
+        function showFeatures() {
+            const featuresGrid = document.getElementById('features-grid');
+            if (featuresGrid.style.display === 'none') {
+                featuresGrid.style.display = 'grid';
+            } else {
+                featuresGrid.style.display = 'none';
+            }
+        }
+
+        function hideAllSections() {
+            const sections = ['home-section', 'login-section', 'register-section', 'documents-section', 'upload-section'];
+            sections.forEach(section => {
+                document.getElementById(section).classList.add('hidden');
+            });
+        }
 
         async function checkSystemStatus() {
             // Check Backend
@@ -436,6 +633,73 @@
                 document.getElementById('frontend-text').textContent = 'Offline';
             }
         }
+
+        // Register form handler
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const registerBtn = document.getElementById('register-btn');
+            const registerText = document.getElementById('register-text');
+            const resultDiv = document.getElementById('register-result');
+            
+            registerBtn.disabled = true;
+            registerText.innerHTML = '<span class="loading"></span> Creating account...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    authToken = data.token;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <h3>✅ Account Created Successfully!</h3>
+                            <p>Welcome to DocuVault, ${data.user.name}!</p>
+                        </div>
+                    `;
+                    
+                    // Show documents section
+                    setTimeout(() => {
+                        document.getElementById('register-section').classList.add('hidden');
+                        document.getElementById('documents-section').classList.remove('hidden');
+                        document.getElementById('upload-section').classList.remove('hidden');
+                        document.getElementById('user-name').textContent = data.user.name;
+                        loadDocuments();
+                    }, 1000);
+                    
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <h3>❌ Registration Failed</h3>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <h3>❌ Connection Error</h3>
+                        <p>${error.message}</p>
+                        <p>Make sure the backend server is running on port 5000</p>
+                    </div>
+                `;
+            } finally {
+                registerBtn.disabled = false;
+                registerText.textContent = '✨ Create Account';
+            }
+        });
 
         // Login form handler
         document.getElementById('login-form').addEventListener('submit', async function(e) {
@@ -614,11 +878,10 @@
             currentUser = null;
             authToken = null;
             
-            document.getElementById('login-section').classList.remove('hidden');
-            document.getElementById('documents-section').classList.add('hidden');
-            document.getElementById('upload-section').classList.add('hidden');
+            showHome();
             
             document.getElementById('login-result').innerHTML = '';
+            document.getElementById('register-result').innerHTML = '';
             document.getElementById('upload-result').innerHTML = '';
         }
 

@@ -28,8 +28,8 @@ const Home = ({ user }) => {
                 <defs>
                   <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#00d4ff" />
-                    <stop offset="50%" stopColor="#0099cc" />
-                    <stop offset="100%" stopColor="#0066aa" />
+                    <stop offset="50%" stopColor="#8b5cf6" />
+                    <stop offset="100%" stopColor="#a855f7" />
                   </linearGradient>
                 </defs>
                 <rect x="20" y="20" width="60" height="60" rx="8" fill="url(#logoGradient)" />
