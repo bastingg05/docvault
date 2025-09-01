@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import API from '../api.js';
 
 const AddDocument = ({ user }) => {
@@ -102,91 +102,130 @@ const AddDocument = ({ user }) => {
 
   return (
     <div className="add-document-container">
-      <div className="add-document-card">
-        <h1 className="add-document-title">Add New Document</h1>
-        
-        {error && <div className="alert alert-error">{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
-              Document Title
-            </label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Enter document title"
-              style={{ width: '100%' }}
-              required
-            />
-          </div>
+      {/* Animated Background */}
+      <div className="add-document-bg">
+        <div className="add-document-orb orb-1"></div>
+        <div className="add-document-orb orb-2"></div>
+        <div className="add-document-orb orb-3"></div>
+      </div>
 
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#333' }}>
-              Description (Optional)
-            </label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter document description"
-              style={{ width: '100%', minHeight: '100px', resize: 'vertical' }}
-            />
+      <div className="add-document-content">
+        {/* Header */}
+        <div className="add-document-header">
+          <div className="header-content">
+            <h1 className="add-document-title">📤 Add New Document</h1>
+            <p className="add-document-subtitle">Upload and organize your documents securely</p>
           </div>
+          <Link to="/documents" className="back-to-documents-btn">
+            <span className="btn-icon">←</span>
+            <span className="btn-text">Back to Documents</span>
+          </Link>
+        </div>
 
-          <div 
-            className={`file-upload-area ${dragActive ? 'dragover' : ''}`}
-            onDragEnter={handleDrag}
-            onDragLeave={handleDrag}
-            onDragOver={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById('file-input').click()}
-          >
-            <input
-              id="file-input"
-              type="file"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-              accept="image/*,.pdf,.doc,.docx,.txt"
-            />
-            
-            {file ? (
-              <div>
-                <div className="file-upload-icon">✅</div>
-                <div className="file-upload-text">{file.name}</div>
-                <div className="file-upload-hint">
-                  Size: {(file.size / 1024 / 1024).toFixed(2)} MB
-                </div>
+        {/* Main Form Card */}
+        <div className="add-document-card">
+          {error && <div className="error-message">{error}</div>}
+          
+          <form onSubmit={handleSubmit} className="upload-form">
+            {/* Title Field */}
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-icon">📝</span>
+                Document Title
+              </label>
+              <input
+                type="text"
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="Enter document title"
+                className="form-input"
+                required
+              />
+            </div>
+
+            {/* Description Field */}
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-icon">📋</span>
+                Description (Optional)
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter document description"
+                className="form-textarea"
+                rows="4"
+              />
+            </div>
+
+            {/* File Upload Area */}
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-icon">📁</span>
+                Select File
+              </label>
+              <div 
+                className={`file-upload-area ${dragActive ? 'dragover' : ''}`}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                onClick={() => document.getElementById('file-input').click()}
+              >
+                <input
+                  id="file-input"
+                  type="file"
+                  onChange={handleFileChange}
+                  className="file-input"
+                  accept="image/*,.pdf,.doc,.docx,.txt"
+                />
+                
+                {file ? (
+                  <div className="file-selected">
+                    <div className="file-upload-icon success">✅</div>
+                    <div className="file-upload-text">{file.name}</div>
+                    <div className="file-upload-hint">
+                      Size: {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </div>
+                    <div className="file-upload-type">
+                      Type: {file.type || 'Unknown'}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="file-upload-prompt">
+                    <div className="file-upload-icon">📁</div>
+                    <div className="file-upload-text">Click to select or drag and drop</div>
+                    <div className="file-upload-hint">
+                      Supports: Images, PDF, Word documents, Text files
+                    </div>
+                    <div className="file-upload-limit">Maximum file size: 10MB</div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div>
-                <div className="file-upload-icon">📁</div>
-                <div className="file-upload-text">Click to select or drag and drop</div>
-                <div className="file-upload-hint">
-                  Supports: Images, PDF, Word documents, Text files (Max 10MB)
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
 
-          <button 
-            type="submit" 
-            className="auth-button"
-            disabled={loading || !file}
-            style={{ width: '100%', marginTop: '20px' }}
-          >
-            {loading ? (
-              <>
-                <span className="loading"></span>
-                Uploading document...
-              </>
-            ) : (
-              'Upload Document'
-            )}
-          </button>
-        </form>
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              className="upload-submit-btn"
+              disabled={loading || !file}
+            >
+              {loading ? (
+                <>
+                  <div className="loading-spinner"></div>
+                  <span>Uploading document...</span>
+                </>
+              ) : (
+                <>
+                  <span className="btn-icon">🚀</span>
+                  <span>Upload Document</span>
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
