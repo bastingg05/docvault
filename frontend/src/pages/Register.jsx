@@ -49,8 +49,23 @@ const Register = ({ onLogin }) => {
   return (
     <div className="auth-container">
       <div className="auth-card">
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ 
+            width: '60px', 
+            height: '60px', 
+            margin: '0 auto 20px',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '24px'
+          }}>
+            ✨
+          </div>
+        </div>
         <h1 className="auth-title">Create Account</h1>
-        <p className="auth-subtitle">Join DocuVault V2 and start managing your documents</p>
+        <p className="auth-subtitle">Join DocuVault and start managing your documents</p>
         
         {error && <div className="alert alert-error">{error}</div>}
         
