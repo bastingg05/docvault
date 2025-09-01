@@ -81,6 +81,112 @@ const Home = ({ user }) => {
           </div>
         </div>
       </div>
+
+      {/* Features Section */}
+      <div className="features-section">
+        <div className="section-header">
+          <h2 className="section-title">Why Choose DocuVault?</h2>
+          <p className="section-subtitle">Enterprise-grade security meets cutting-edge technology</p>
+        </div>
+        
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <circle cx="12" cy="16" r="1"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <h3 className="feature-title">Military-Grade Security</h3>
+            <p className="feature-description">
+              AES-256 encryption with zero-knowledge architecture ensures your documents remain completely private.
+            </p>
+            <div className="feature-stats">
+              <span className="stat-badge">256-bit</span>
+              <span className="stat-badge">Zero-Knowledge</span>
+            </div>
+          </div>
+          
+          <div className="feature-card">
+            <div className="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
+                <line x1="12" y1="22.08" x2="12" y2="12"/>
+              </svg>
+            </div>
+            <h3 className="feature-title">AI-Powered Organization</h3>
+            <p className="feature-description">
+              Advanced AI automatically categorizes, tags, and indexes your documents for instant retrieval.
+            </p>
+            <div className="feature-stats">
+              <span className="stat-badge">99.8% Accuracy</span>
+              <span className="stat-badge">10x Faster</span>
+            </div>
+          </div>
+          
+          <div className="feature-card">
+            <div className="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 className="feature-title">Universal Access</h3>
+            <p className="feature-description">
+              Access your documents from any device, anywhere with real-time synchronization and offline capabilities.
+            </p>
+            <div className="feature-stats">
+              <span className="stat-badge">24/7 Access</span>
+              <span className="stat-badge">Global CDN</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Specialties Section */}
+      <div className="specialties-section">
+        <div className="section-header">
+          <h2 className="section-title">Our Specialties</h2>
+          <p className="section-subtitle">Built for enterprise scale and security</p>
+        </div>
+        
+        <div className="specialties-grid">
+          <div className="specialty-item">
+            <div className="specialty-number">01</div>
+            <h3 className="specialty-title">Document Management</h3>
+            <p className="specialty-description">
+              Streamlined workflow for creating, editing, and organizing documents with version control.
+            </p>
+          </div>
+          
+          <div className="specialty-item">
+            <div className="specialty-number">02</div>
+            <h3 className="specialty-title">Advanced Search</h3>
+            <p className="specialty-description">
+              Powerful search capabilities with filters, tags, and AI-powered content recognition.
+            </p>
+          </div>
+          
+          <div className="specialty-item">
+            <div className="specialty-number">03</div>
+            <h3 className="specialty-title">Team Collaboration</h3>
+            <p className="specialty-description">
+              Real-time collaboration tools with role-based access control and audit trails.
+            </p>
+          </div>
+          
+          <div className="specialty-item">
+            <div className="specialty-number">04</div>
+            <h3 className="specialty-title">Compliance Ready</h3>
+            <p className="specialty-description">
+              Built-in compliance features for GDPR, SOC 2, HIPAA, and other regulatory requirements.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
