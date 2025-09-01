@@ -76,8 +76,8 @@ const Documents = ({ user }) => {
     return (
       <div className="documents-container">
         <div className="loading-container">
-          <div className="loading"></div>
-          <p>Loading your documents...</p>
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading your documents...</p>
         </div>
       </div>
     );
@@ -85,71 +85,88 @@ const Documents = ({ user }) => {
 
   return (
     <div className="documents-container">
-      <div className="documents-header">
-        <h1 className="documents-title">My Documents</h1>
-        <Link to="/add-document" className="btn btn-primary">
-          ➕ Add Document
-        </Link>
+      {/* Animated Background */}
+      <div className="documents-bg">
+        <div className="documents-orb orb-1"></div>
+        <div className="documents-orb orb-2"></div>
+        <div className="documents-orb orb-3"></div>
       </div>
 
-      {/* Error message hidden - {error && <div className="alert alert-error">{error}</div>} */}
-
-      {documents.length === 0 ? (
-        <div className="card" style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div style={{ fontSize: '64px', marginBottom: '20px' }}>📁</div>
-          <h2 style={{ marginBottom: '16px', color: '#333' }}>No documents yet</h2>
-          <p style={{ marginBottom: '30px', color: '#666' }}>
-            Start by uploading your first document to get organized.
-          </p>
-          <Link to="/add-document" className="btn btn-primary">
-            Upload Your First Document
+      <div className="documents-content">
+        <div className="documents-header">
+          <div className="header-content">
+            <h1 className="documents-title">📁 My Documents</h1>
+            <p className="documents-subtitle">Manage and organize your secure documents</p>
+          </div>
+          <Link to="/add-document" className="add-document-btn">
+            <span className="btn-icon">➕</span>
+            <span className="btn-text">Add Document</span>
           </Link>
         </div>
-      ) : (
-        <div className="documents-grid">
-          {documents.map((document) => (
-            <div key={document._id} className="document-card">
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '24px', marginRight: '12px' }}>
-                  {getFileIcon(document.fileType)}
-                </span>
-                <h3 className="document-title">{document.title}</h3>
+
+        {error && <div className="error-message">{error}</div>}
+
+        {documents.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📁</div>
+            <h2 className="empty-title">No documents yet</h2>
+            <p className="empty-description">
+              Start by uploading your first document to get organized and secure.
+            </p>
+            <Link to="/add-document" className="empty-cta">
+              <span className="cta-icon">🚀</span>
+              <span className="cta-text">Upload Your First Document</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="documents-grid">
+            {documents.map((document, index) => (
+              <div 
+                key={document._id} 
+                className="document-card"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="card-header">
+                  <div className="file-icon">{getFileIcon(document.fileType)}</div>
+                  <h3 className="document-title">{document.title}</h3>
+                </div>
+                
+                {document.description && (
+                  <p className="document-description">{document.description}</p>
+                )}
+                
+                <div className="document-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">Size:</span>
+                    <span className="meta-value">{formatFileSize(document.fileSize)}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Uploaded:</span>
+                    <span className="meta-value">{formatDate(document.createdAt)}</span>
+                  </div>
+                </div>
+                
+                <div className="document-actions">
+                  <button 
+                    className="action-btn view-btn"
+                    onClick={() => window.open(`/uploads/${document.fileName}`, '_blank')}
+                  >
+                    <span className="btn-icon">👁️</span>
+                    <span className="btn-text">View</span>
+                  </button>
+                  <button 
+                    className="action-btn delete-btn"
+                    onClick={() => handleDelete(document._id)}
+                  >
+                    <span className="btn-icon">🗑️</span>
+                    <span className="btn-text">Delete</span>
+                  </button>
+                </div>
               </div>
-              
-              {document.description && (
-                <p className="document-description">{document.description}</p>
-              )}
-              
-              <div className="document-meta">
-                <span>{formatFileSize(document.fileSize)}</span>
-                <span>{formatDate(document.createdAt)}</span>
-              </div>
-              
-              <div className="document-actions">
-                <button 
-                  className="btn btn-secondary"
-                  style={{ fontSize: '14px', padding: '8px 16px' }}
-                  onClick={() => window.open(`/uploads/${document.fileName}`, '_blank')}
-                >
-                  👁️ View
-                </button>
-                <button 
-                  className="btn"
-                  style={{ 
-                    fontSize: '14px', 
-                    padding: '8px 16px',
-                    background: '#ff4757',
-                    color: 'white'
-                  }}
-                  onClick={() => handleDelete(document._id)}
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
