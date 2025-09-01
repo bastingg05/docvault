@@ -24,11 +24,20 @@ export const loginUser = async (email, password) => {
     console.log('🌐 Attempting to login user...');
     
     const { data } = await API.post("/api/users/login", { email, password });
+    console.log('📥 Login response:', data);
+    
     if (data.token) {
       localStorage.setItem("token", data.token);
     }
-    // Return the user object directly for the onLogin callback
-    return { user: data, token: data.token };
+    
+    // Handle different response formats from backend
+    if (data.user) {
+      // Backend returns {message, user, token}
+      return { user: data.user, token: data.token };
+    } else {
+      // Backend returns {_id, name, email, token}
+      return { user: data, token: data.token };
+    }
   } catch (error) {
     console.error('❌ Login failed:', error);
     throw error;

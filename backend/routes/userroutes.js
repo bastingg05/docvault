@@ -30,9 +30,12 @@ router.post("/register", async (req, res) => {
         password: "hashed_password"
       };
       res.status(201).json({
-        _id: mockUser._id,
-        name: mockUser.name,
-        email: mockUser.email,
+        message: "Registration successful (Demo Mode)",
+        user: {
+          _id: mockUser._id,
+          name: mockUser.name,
+          email: mockUser.email,
+        },
         token: generateToken(mockUser._id),
       });
       return;
@@ -43,9 +46,12 @@ router.post("/register", async (req, res) => {
 
     const user = await User.create({ name, email, password });
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      message: "Registration successful",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
       token: generateToken(user._id),
     });
   } catch (err) {
@@ -67,9 +73,12 @@ router.post("/login", async (req, res) => {
         password: "hashed_password"
       };
       res.json({
-        _id: mockUser._id,
-        name: mockUser.name,
-        email: mockUser.email,
+        message: "Login successful (Demo Mode)",
+        user: {
+          _id: mockUser._id,
+          name: mockUser.name,
+          email: mockUser.email,
+        },
         token: generateToken(mockUser._id),
       });
       return;
@@ -78,9 +87,12 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (user && (await user.matchPassword(password))) {
       res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
+        message: "Login successful",
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+        },
         token: generateToken(user._id),
       });
     } else {
