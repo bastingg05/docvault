@@ -1,165 +1,164 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+import memoryDB from "./backend/config/memoryDB.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+const PORT = 5000;
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 
-// Direct MongoDB Atlas connection
-const MONGODB_URI = 'mongodb+srv://bastingg05:gladwin2@bastin0.zvpymix.mongodb.net/docuvault?retryWrites=true&w=majority&appName=Bastin0';
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// User Schema
-const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now }
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'backend', 'uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, 'backend', 'uploads');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
 });
 
-const User = mongoose.model('User', userSchema);
-
-// Connect to MongoDB
-async function connectDB() {
-  try {
-    console.log('🔗 Connecting to MongoDB Atlas...');
-    await mongoose.connect(MONGODB_URI, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false,
-    });
-    console.log('✅ MongoDB Connected Successfully!');
-    
-    // Create default user
-    const defaultUser = await User.findOne({ email: 'bastin123@gmail.com' });
-    if (!defaultUser) {
-      const hashedPassword = await bcrypt.hash('test123', 12);
-      await User.create({
-        name: 'Bastin',
-        email: 'bastin123@gmail.com',
-        password: hashedPassword
-      });
-      console.log('✅ Default user created: bastin123@gmail.com / test123');
-    } else {
-      console.log('✅ Default user already exists');
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
-    return false;
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   }
-}
+});
+
+// Simple authentication middleware
+const simpleAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    // For demo purposes, accept any token
+    req.user = { _id: 'demo-user-1' };
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    version: '2.0.0',
+    database: 'memory',
+    uptime: process.uptime()
   });
 });
 
 // Login endpoint
-app.post('/api/users/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
-    }
-    
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      'your-super-secret-jwt-key-change-this-in-production',
-      { expiresIn: '24h' }
-    );
-    
+app.post('/api/users/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  if (email === 'bastin123@gmail.com' && password === 'test123') {
+    const token = 'demo-token-' + Date.now();
     res.json({
-      message: 'Login successful',
+      token,
       user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email
-      },
-      token
+        _id: 'demo-user-1',
+        email: 'bastin123@gmail.com',
+        name: 'Demo User'
+      }
     });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
-// Register endpoint
-app.post('/api/users/register', async (req, res) => {
+// Get documents
+app.get('/api/documents', simpleAuth, async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Name, email, and password are required' });
-    }
-    
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-    
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword
-    });
-    
-    const token = jwt.sign(
-      { userId: user._id, email: user.email },
-      'your-super-secret-jwt-key-change-this-in-production',
-      { expiresIn: '24h' }
-    );
-    
-    res.status(201).json({
-      message: 'User created successfully',
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email
-      },
-      token
-    });
+    const documents = await memoryDB.findDocumentsByUser(req.user._id);
+    res.json(documents);
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Upload document
+app.post('/api/documents/upload', simpleAuth, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const { title, description } = req.body;
+    
+    const document = await memoryDB.createDocument({
+      title: title || req.file.originalname,
+      description: description || '',
+      fileName: req.file.filename,
+      fileSize: req.file.size,
+      fileType: req.file.mimetype,
+      fileUrl: `/uploads/${req.file.filename}`,
+      uploadedBy: req.user._id
+    });
+
+    res.status(201).json(document);
+  } catch (error) {
+    // Clean up uploaded file if document creation fails
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
+    }
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Delete document
+app.delete('/api/documents/:id', simpleAuth, async (req, res) => {
+  try {
+    const document = await memoryDB.findDocumentById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    
+    if (document.uploadedBy !== req.user._id) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+    
+    // Remove the file from uploads directory
+    if (document.fileName) {
+      const filePath = path.join(__dirname, 'backend', 'uploads', document.fileName);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    }
+    
+    await memoryDB.deleteDocument(req.params.id);
+    res.json({ message: "Document removed" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-
-async function startServer() {
-  const dbConnected = await connectDB();
-  
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📊 Database status: ${dbConnected ? 'Connected' : 'Disconnected'}`);
-    console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-    console.log(`🔐 Login: POST http://localhost:${PORT}/api/users/login`);
-    console.log(`📝 Register: POST http://localhost:${PORT}/api/users/register`);
-  });
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`🚀 Simple DocuVault server running on port ${PORT}`);
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+  console.log(`📁 Uploads directory: ${path.join(__dirname, 'backend', 'uploads')}`);
+  console.log(`💾 Using in-memory database for immediate testing`);
+  console.log(`🔑 Demo login: bastin123@gmail.com / test123`);
+});

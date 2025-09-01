@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DocuVault Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #444;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #06b6d4;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0891b2;
+        }
+        .result {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background: #4a1a1a;
+            border: 1px solid #dc2626;
+        }
+        .success {
+            background: #1a4a1a;
+            border: 1px solid #16a34a;
+        }
+        .file-info {
+            background: #2a2a2a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 DocuVault Upload Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Step 1: Get Authentication Token</h2>
+        <p>First, you need to log in to get a token. Use these credentials:</p>
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" id="email" value="bastin123@gmail.com" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" id="password" value="test123" placeholder="Enter password">
+        </div>
+        <button onclick="login()">🔑 Login & Get Token</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📤 Step 2: Test File Upload</h2>
+        <p>Select a file and upload it to test the functionality:</p>
+        <div class="form-group">
+            <label>Document Title:</label>
+            <input type="text" id="title" placeholder="Enter document title">
+        </div>
+        <div class="form-group">
+            <label>Description (Optional):</label>
+            <textarea id="description" rows="3" placeholder="Enter description"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Select File:</label>
+            <input type="file" id="file" accept="image/*,.pdf,.doc,.docx,.txt">
+        </div>
+        <div id="file-info" class="file-info" style="display: none;"></div>
+        <button onclick="uploadFile()" id="upload-btn" disabled>🚀 Upload Document</button>
+        <div id="upload-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📁 Step 3: View Uploaded Documents</h2>
+        <button onclick="getDocuments()">📋 Get My Documents</button>
+        <div id="documents-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Step 4: Test Backend Health</h2>
+        <button onclick="testHealth()">💚 Check Backend Health</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <script>
+        let authToken = '';
+        const API_BASE = 'http://localhost:5000';
+
+        // File selection handler
+        document.getElementById('file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const fileInfo = document.getElementById('file-info');
+                fileInfo.innerHTML = `
+                    <strong>Selected File:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                    <strong>Type:</strong> ${file.type || 'Unknown'}
+                `;
+                fileInfo.style.display = 'block';
+                
+                // Auto-fill title if empty
+                if (!document.getElementById('title').value) {
+                    document.getElementById('title').value = file.name;
+                }
+                
+                // Enable upload button if we have a token
+                document.getElementById('upload-btn').disabled = !authToken;
+            }
+        });
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            try {
+                resultDiv.innerHTML = '🔄 Logging in...';
+                resultDiv.className = 'result';
+                
+                const response = await fetch(`${API_BASE}/api/users/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    resultDiv.innerHTML = `✅ Login successful!\nToken: ${data.token.substring(0, 50)}...\nUser: ${data.user.email}`;
+                    resultDiv.className = 'result success';
+                    
+                    // Enable upload button
+                    document.getElementById('upload-btn').disabled = false;
+                } else {
+                    resultDiv.innerHTML = `❌ Login failed: ${data.message}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function uploadFile() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const fileInput = document.getElementById('file');
+            const resultDiv = document.getElementById('upload-result');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '❌ Please select a file first';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            if (!title) {
+                resultDiv.innerHTML = '❌ Please enter a document title';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            try {
+                resultDiv.innerHTML = '🔄 Uploading file...';
+                resultDiv.className = 'result';
+                
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+                formData.append('title', title);
+                formData.append('description', description);
+                
+                const response = await fetch(`${API_BASE}/api/documents/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Upload successful!\nDocument ID: ${data._id}\nTitle: ${data.title}\nFile: ${data.fileName}\nSize: ${(data.fileSize / 1024 / 1024).toFixed(2)} MB`;
+                    resultDiv.className = 'result success';
+                    
+                    // Clear form
+                    document.getElementById('title').value = '';
+                    document.getElementById('description').value = '';
+                    fileInput.value = '';
+                    document.getElementById('file-info').style.display = 'none';
+                } else {
+                    resultDiv.innerHTML = `❌ Upload failed: ${data.message}\nStatus: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function getDocuments() {
+            if (!authToken) {
+                document.getElementById('documents-result').innerHTML = '❌ Please login first to get documents';
+                return;
+            }
+            
+            try {
+                const resultDiv = document.getElementById('documents-result');
+                resultDiv.innerHTML = '🔄 Fetching documents...';
+                
+                const response = await fetch(`${API_BASE}/api/documents`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.length === 0) {
+                        resultDiv.innerHTML = '📁 No documents found';
+                    } else {
+                        let docsHtml = `📁 Found ${data.length} document(s):\n\n`;
+                        data.forEach((doc, index) => {
+                            docsHtml += `${index + 1}. ${doc.title}\n`;
+                            docsHtml += `   ID: ${doc._id}\n`;
+                            docsHtml += `   File: ${doc.fileName}\n`;
+                            docsHtml += `   Size: ${(doc.fileSize / 1024 / 1024).toFixed(2)} MB\n`;
+                            docsHtml += `   Type: ${doc.fileType}\n`;
+                            docsHtml += `   Uploaded: ${new Date(doc.createdAt).toLocaleString()}\n\n`;
+                        });
+                        resultDiv.innerHTML = docsHtml;
+                    }
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Failed to get documents: ${data.message}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('documents-result').innerHTML = `❌ Error: ${error.message}`;
+                document.getElementById('documents-result').className = 'result error';
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const resultDiv = document.getElementById('health-result');
+                resultDiv.innerHTML = '🔄 Checking backend health...';
+                
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Backend is healthy!\nStatus: ${data.status}\nVersion: ${data.version}\nDatabase: ${data.database}\nUptime: ${(data.uptime / 60).toFixed(1)} minutes`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Backend health check failed: ${data.message}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                document.getElementById('health-result').innerHTML = `❌ Error: ${error.message}`;
+                document.getElementById('health-result').className = 'result error';
+            }
+        }
+
+        // Auto-test health on page load
+        window.addEventListener('load', testHealth);
+    </script>
+</body>
+</html>

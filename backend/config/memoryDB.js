@@ -1,48 +1,77 @@
-// Simple in-memory database for fallback
+// In-memory database for demo/testing purposes
 class MemoryDB {
   constructor() {
-    this.users = new Map();
-    this.documents = new Map();
-    this.sessions = new Map();
+    this.documents = [];
+    this.users = [
+      {
+        _id: 'demo-user-1',
+        email: 'bastin123@gmail.com',
+        password: 'test123', // In real app, this would be hashed
+        name: 'Demo User'
+      }
+    ];
+    this.nextId = 1;
   }
 
-  // User operations
-  createUser(userData) {
-    const id = Date.now().toString();
-    const user = { id, ...userData, createdAt: new Date() };
-    this.users.set(id, user);
-    return user;
+  // Document operations
+  async createDocument(docData) {
+    const document = {
+      _id: `doc-${this.nextId++}`,
+      ...docData,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.documents.push(document);
+    return document;
   }
 
-  findUserByEmail(email) {
-    for (const user of this.users.values()) {
-      if (user.email === email) return user;
+  async findDocumentsByUser(userId) {
+    return this.documents.filter(doc => doc.uploadedBy === userId);
+  }
+
+  async findDocumentById(id) {
+    return this.documents.find(doc => doc._id === id);
+  }
+
+  async updateDocument(id, updates) {
+    const index = this.documents.findIndex(doc => doc._id === id);
+    if (index !== -1) {
+      this.documents[index] = { ...this.documents[index], ...updates, updatedAt: new Date() };
+      return this.documents[index];
     }
     return null;
   }
 
-  findUserById(id) {
-    return this.users.get(id) || null;
+  async deleteDocument(id) {
+    const index = this.documents.findIndex(doc => doc._id === id);
+    if (index !== -1) {
+      const deleted = this.documents.splice(index, 1)[0];
+      return deleted;
+    }
+    return null;
   }
 
-  // Document operations
-  createDocument(docData) {
-    const id = Date.now().toString();
-    const document = { id, ...docData, createdAt: new Date() };
-    this.documents.set(id, document);
-    return document;
+  // User operations
+  async findUserByEmail(email) {
+    return this.users.find(user => user.email === email);
   }
 
-  getDocuments(userId) {
-    return Array.from(this.documents.values()).filter(doc => doc.userId === userId);
+  async findUserById(id) {
+    return this.users.find(user => user._id === id);
   }
 
-  deleteDocument(id) {
-    return this.documents.delete(id);
+  // Health check
+  async healthCheck() {
+    return {
+      status: 'healthy',
+      database: 'memory',
+      documentsCount: this.documents.length,
+      usersCount: this.users.length
+    };
   }
 }
 
-// Global instance
+// Create singleton instance
 const memoryDB = new MemoryDB();
 
 export default memoryDB;
