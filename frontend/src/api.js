@@ -18,7 +18,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !config.headers.Authorization) {
+      // Only set Authorization if not already set (to avoid overriding custom headers)
       config.headers.Authorization = `Bearer ${token}`;
     }
     
@@ -30,6 +31,7 @@ api.interceptors.request.use(
     console.log(`🔧 Config:`, config);
     console.log(`🌍 Origin: ${window.location.origin}`);
     console.log(`🔗 Target: ${config.baseURL}`);
+    console.log(`🔑 Headers:`, config.headers);
     return config;
   },
   (error) => {

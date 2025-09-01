@@ -81,20 +81,66 @@ const AddDocument = ({ user }) => {
     }
 
     try {
+      // Debug logging
+      console.log('🔍 Starting upload process...');
+      console.log('📁 File:', file);
+      console.log('📝 Form data:', formData);
+      
+      // Check if user is logged in
+      const token = localStorage.getItem('token');
+      console.log('🔑 Token exists:', !!token);
+      console.log('🔑 Token value:', token ? token.substring(0, 20) + '...' : 'No token');
+      
+      if (!token) {
+        setError('You are not logged in. Please log in again.');
+        setLoading(false);
+        return;
+      }
+
       const uploadData = new FormData();
       uploadData.append('file', file);
       uploadData.append('title', formData.title);
       uploadData.append('description', formData.description);
 
-      await API.post('/api/documents/upload', uploadData, {
+      console.log('📤 Uploading to:', '/api/documents/upload');
+      console.log('📤 FormData entries:');
+      for (let [key, value] of uploadData.entries()) {
+        console.log(`  ${key}:`, value);
+      }
+
+      const response = await API.post('/api/documents/upload', uploadData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          // Don't set Content-Type for multipart/form-data - let browser set it with boundary
+          'Authorization': `Bearer ${token}`
         }
       });
 
+      console.log('✅ Upload successful:', response.data);
       navigate('/documents');
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to upload document');
+      console.error('❌ Upload failed:', error);
+      console.error('❌ Error response:', error.response);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error code:', error.code);
+      
+      let errorMessage = 'Failed to upload document';
+      
+      if (error.response) {
+        // Server responded with error
+        console.log('📡 Server responded with error status:', error.response.status);
+        console.log('📡 Server error data:', error.response.data);
+        errorMessage = error.response.data?.message || `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        // Request was made but no response received
+        console.log('📡 No response received from server');
+        errorMessage = 'No response from server. Please check your connection.';
+      } else {
+        // Something else happened
+        console.log('📡 Request setup error:', error.message);
+        errorMessage = error.message || 'Request setup failed';
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
