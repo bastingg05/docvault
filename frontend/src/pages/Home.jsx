@@ -11,8 +11,8 @@ const Home = ({ user }) => {
         <div className="gradient-orb orb-3"></div>
       </div>
 
-      {/* Main Content */}
-      <div className="hero-section">
+      {/* Hero Section */}
+      <section className="hero-section">
         <div className="hero-content">
           {/* Super Logo */}
           <div className="logo-container">
@@ -66,9 +66,13 @@ const Home = ({ user }) => {
             <div className="brand-tagline">Enterprise Security</div>
           </div>
 
-          {/* Short Headings */}
-          <h2 className="hero-title">Secure Documents</h2>
-          <h3 className="hero-subtitle">Enterprise Management</h3>
+          {/* Previous Title and Subtitle */}
+          <h2 className="hero-title">Secure Document Management</h2>
+          <h3 className="hero-subtitle">Enterprise-Grade Security with AI-Powered Organization</h3>
+          <p className="hero-description">
+            Military-grade encryption, intelligent document organization, and seamless collaboration tools 
+            designed for enterprise-scale document management.
+          </p>
 
           {/* Simple Actions */}
           <div className="hero-actions">
@@ -80,10 +84,10 @@ const Home = ({ user }) => {
             </Link>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Features Section */}
-      <div className="features-section">
+      <section className="features-section">
         <div className="section-header">
           <h2 className="section-title">Why Choose DocuVault?</h2>
           <p className="section-subtitle">Enterprise-grade security meets cutting-edge technology</p>
@@ -144,10 +148,10 @@ const Home = ({ user }) => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Specialties Section */}
-      <div className="specialties-section">
+      <section className="specialties-section">
         <div className="section-header">
           <h2 className="section-title">Our Specialties</h2>
           <p className="section-subtitle">Built for enterprise scale and security</p>
@@ -186,7 +190,23 @@ const Home = ({ user }) => {
             </p>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="cta-section">
+        <div className="cta-content">
+          <h2 className="cta-title">Ready to Secure Your Documents?</h2>
+          <p className="cta-subtitle">Join thousands of enterprises who trust DocuVault for their document security needs.</p>
+          <div className="cta-actions">
+            <Link to="/register" className="cta-button-primary">
+              Start Free Trial
+            </Link>
+            <Link to="/login" className="cta-button-secondary">
+              Sign In
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
