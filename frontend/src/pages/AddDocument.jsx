@@ -111,26 +111,92 @@ const AddDocument = ({ user }) => {
 
       <div className="add-document-content">
         {/* Header */}
-        <div className="add-document-header">
+        <div className="add-document-header" style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '40px', 
+          padding: '40px', 
+          background: 'rgba(30, 41, 59, 0.95)', 
+          borderRadius: '24px', 
+          border: '2px solid rgba(6, 182, 212, 0.6)', 
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
+          position: 'relative',
+          zIndex: 15
+        }}>
           <div className="header-content">
-            <h1 className="add-document-title">📤 Add New Document</h1>
-            <p className="add-document-subtitle">Upload and organize your documents securely</p>
+            <h1 style={{ 
+              fontSize: '42px', 
+              fontWeight: '800', 
+              color: '#ffffff', 
+              marginBottom: '16px', 
+              letterSpacing: '-1px',
+              textShadow: '0 0 30px rgba(6, 182, 212, 0.5)',
+              margin: 0,
+              padding: 0
+            }}>📤 Add New Document</h1>
+            <p style={{ 
+              fontSize: '18px', 
+              color: '#ffffff', 
+              fontWeight: '600', 
+              lineHeight: '1.6',
+              margin: 0,
+              padding: 0
+            }}>Upload and organize your documents securely</p>
           </div>
-          <Link to="/documents" className="back-to-documents-btn">
-            <span className="btn-icon">←</span>
-            <span className="btn-text">Back to Documents</span>
+          <Link to="/documents" style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px', 
+            padding: '14px 24px', 
+            background: 'rgba(139, 92, 246, 0.3)', 
+            color: '#ffffff', 
+            textDecoration: 'none', 
+            border: '2px solid rgba(139, 92, 246, 0.6)', 
+            borderRadius: '12px', 
+            fontWeight: '600', 
+            fontSize: '14px', 
+            transition: 'all 0.3s ease'
+          }}>
+            <span>←</span>
+            <span>Back to Documents</span>
           </Link>
         </div>
 
         {/* Main Form Card */}
-        <div className="add-document-card">
-          {error && <div className="error-message">{error}</div>}
+        <div style={{ 
+          background: 'rgba(30, 41, 59, 0.95)', 
+          borderRadius: '24px', 
+          padding: '40px', 
+          border: '2px solid rgba(6, 182, 212, 0.6)', 
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
+          position: 'relative',
+          zIndex: 15
+        }}>
+          {error && <div style={{ 
+            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', 
+            color: 'white', 
+            padding: '16px 24px', 
+            borderRadius: '12px', 
+            marginBottom: '24px', 
+            fontWeight: '600', 
+            textAlign: 'center', 
+            boxShadow: '0 8px 24px rgba(239, 68, 68, 0.3)'
+          }}>{error}</div>}
           
-          <form onSubmit={handleSubmit} className="upload-form">
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
             {/* Title Field */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📝</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: '#ffffff', 
+                marginBottom: '4px'
+              }}>
+                <span>📝</span>
                 Document Title
               </label>
               <input
@@ -139,15 +205,32 @@ const AddDocument = ({ user }) => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="Enter document title"
-                className="form-input"
+                style={{ 
+                  width: '100%', 
+                  padding: '16px 20px', 
+                  background: 'rgba(51, 65, 85, 0.8)', 
+                  border: '2px solid rgba(6, 182, 212, 0.4)', 
+                  borderRadius: '12px', 
+                  color: '#ffffff', 
+                  fontSize: '16px', 
+                  fontFamily: 'Inter, sans-serif'
+                }}
                 required
               />
             </div>
 
             {/* Description Field */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📋</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: '#ffffff', 
+                marginBottom: '4px'
+              }}>
+                <span>📋</span>
                 Description (Optional)
               </label>
               <textarea
@@ -155,19 +238,48 @@ const AddDocument = ({ user }) => {
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Enter document description"
-                className="form-textarea"
                 rows="4"
+                style={{ 
+                  width: '100%', 
+                  padding: '16px 20px', 
+                  background: 'rgba(51, 65, 85, 0.8)', 
+                  border: '2px solid rgba(6, 182, 212, 0.4)', 
+                  borderRadius: '12px', 
+                  color: '#ffffff', 
+                  fontSize: '16px', 
+                  fontFamily: 'Inter, sans-serif',
+                  minHeight: '120px',
+                  resize: 'vertical',
+                  lineHeight: '1.6'
+                }}
               />
             </div>
 
             {/* File Upload Area */}
-            <div className="form-group">
-              <label className="form-label">
-                <span className="label-icon">📁</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <label style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                fontSize: '16px', 
+                fontWeight: '600', 
+                color: '#ffffff', 
+                marginBottom: '4px'
+              }}>
+                <span>📁</span>
                 Select File
               </label>
               <div 
-                className={`file-upload-area ${dragActive ? 'dragover' : ''}`}
+                style={{ 
+                  position: 'relative', 
+                  padding: '40px', 
+                  background: dragActive ? 'rgba(6, 182, 212, 0.2)' : 'rgba(51, 65, 85, 0.6)', 
+                  border: dragActive ? '3px solid rgba(6, 182, 212, 0.8)' : '3px dashed rgba(6, 182, 212, 0.4)', 
+                  borderRadius: '16px', 
+                  textAlign: 'center', 
+                  cursor: 'pointer', 
+                  transition: 'all 0.3s ease'
+                }}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
@@ -178,29 +290,37 @@ const AddDocument = ({ user }) => {
                   id="file-input"
                   type="file"
                   onChange={handleFileChange}
-                  className="file-input"
+                  style={{ display: 'none' }}
                   accept="image/*,.pdf,.doc,.docx,.txt"
                 />
                 
                 {file ? (
-                  <div className="file-selected">
-                    <div className="file-upload-icon success">✅</div>
-                    <div className="file-upload-text">{file.name}</div>
-                    <div className="file-upload-hint">
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '8px' }}>✅</div>
+                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#ffffff', marginBottom: '8px' }}>{file.name}</div>
+                    <div style={{ fontSize: '14px', color: '#e2e8f0', lineHeight: '1.5' }}>
                       Size: {(file.size / 1024 / 1024).toFixed(2)} MB
                     </div>
-                    <div className="file-upload-type">
+                    <div style={{ 
+                      fontSize: '12px', 
+                      color: '#06b6d4', 
+                      fontWeight: '600', 
+                      background: 'rgba(6, 182, 212, 0.1)', 
+                      padding: '4px 12px', 
+                      borderRadius: '8px', 
+                      border: '1px solid rgba(6, 182, 212, 0.2)'
+                    }}>
                       Type: {file.type || 'Unknown'}
                     </div>
                   </div>
                 ) : (
-                  <div className="file-upload-prompt">
-                    <div className="file-upload-icon">📁</div>
-                    <div className="file-upload-text">Click to select or drag and drop</div>
-                    <div className="file-upload-hint">
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ fontSize: '48px', marginBottom: '8px' }}>📁</div>
+                    <div style={{ fontSize: '18px', fontWeight: '600', color: '#ffffff', marginBottom: '8px' }}>Click to select or drag and drop</div>
+                    <div style={{ fontSize: '14px', color: '#e2e8f0', lineHeight: '1.5' }}>
                       Supports: Images, PDF, Word documents, Text files
                     </div>
-                    <div className="file-upload-limit">Maximum file size: 10MB</div>
+                    <div style={{ fontSize: '12px', color: '#cbd5e1', fontWeight: '500' }}>Maximum file size: 10MB</div>
                   </div>
                 )}
               </div>
@@ -209,17 +329,43 @@ const AddDocument = ({ user }) => {
             {/* Submit Button */}
             <button 
               type="submit" 
-              className="upload-submit-btn"
               disabled={loading || !file}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center', 
+                gap: '12px', 
+                width: '100%', 
+                padding: '18px 32px', 
+                background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 25%, #3b82f6 50%, #1d4ed8 100%)', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '16px', 
+                fontWeight: '700', 
+                fontSize: '18px', 
+                cursor: loading || !file ? 'not-allowed' : 'pointer', 
+                transition: 'all 0.4s ease', 
+                boxShadow: '0 10px 30px rgba(6, 182, 212, 0.4)', 
+                letterSpacing: '1px', 
+                marginTop: '20px',
+                opacity: loading || !file ? 0.6 : 1
+              }}
             >
               {loading ? (
                 <>
-                  <div className="loading-spinner"></div>
+                  <div style={{ 
+                    width: '20px', 
+                    height: '20px', 
+                    border: '2px solid rgba(255, 255, 255, 0.3)', 
+                    borderRadius: '50%', 
+                    borderTopColor: '#ffffff', 
+                    animation: 'spin 1s ease-in-out infinite'
+                  }}></div>
                   <span>Uploading document...</span>
                 </>
               ) : (
                 <>
-                  <span className="btn-icon">🚀</span>
+                  <span>🚀</span>
                   <span>Upload Document</span>
                 </>
               )}
