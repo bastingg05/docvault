@@ -5,6 +5,7 @@ import protect from "../middleware/authMiddleware.js";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -29,6 +30,17 @@ const upload = multer({
   storage: storage,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Initialize GridFS bucket for environments without persistent disk (e.g., Render)
+let gridFSBucket;
+mongoose.connection.on('connected', () => {
+  try {
+    gridFSBucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
+    console.log('✅ GridFS bucket ready');
+  } catch (e) {
+    console.warn('GridFS init failed:', e.message);
   }
 });
 
@@ -90,8 +102,43 @@ router.post("/upload", protect, upload.single('file'), async (req, res) => {
     }
 
     const { title, category, expiryDate, description } = req.body;
-    
-    // Create document with file info
+
+    // Prefer GridFS storage when available
+    if (gridFSBucket) {
+      const readStream = fs.createReadStream(req.file.path);
+      const uploadStream = gridFSBucket.openUploadStream(req.file.originalname, {
+        contentType: req.file.mimetype,
+        metadata: { userId: req.user._id.toString() }
+      });
+
+      readStream
+        .pipe(uploadStream)
+        .on('error', (e) => {
+          console.error('GridFS upload error:', e);
+          try { fs.unlinkSync(req.file.path); } catch {}
+          return res.status(500).json({ message: 'File storage failed' });
+        })
+        .on('finish', async (file) => {
+          try { fs.unlinkSync(req.file.path); } catch {}
+          const doc = await Document.create({
+            title: title || req.file.originalname,
+            category: category || 'General',
+            expiryDate: expiryDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+            fileUrl: `/api/documents/file/${file._id.toString()}`,
+            fileId: file._id,
+            fileName: req.file.originalname,
+            fileSize: req.file.size,
+            fileType: req.file.mimetype,
+            description: description || '',
+            uploadedBy: req.user._id
+          });
+          return res.status(201).json(doc);
+        });
+
+      return; // response will be sent in finish handler
+    }
+
+    // Fallback: keep file on disk
     const doc = await Document.create({
       title: title || req.file.originalname,
       category: category || 'General',
@@ -104,13 +151,26 @@ router.post("/upload", protect, upload.single('file'), async (req, res) => {
       uploadedBy: req.user._id
     });
 
-    res.status(201).json(doc);
+    return res.status(201).json(doc);
   } catch (err) {
-    // Clean up uploaded file if document creation fails
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
+    if (req.file && req.file.path) {
+      try { fs.unlinkSync(req.file.path); } catch {}
     }
     res.status(400).json({ message: err.message });
+  }
+});
+
+// Stream a file by GridFS id
+router.get('/file/:id', protect, async (req, res) => {
+  try {
+    if (!gridFSBucket) return res.status(404).json({ message: 'File storage unavailable' });
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const files = await mongoose.connection.db.collection('uploads.files').find({ _id: id }).toArray();
+    if (!files || files.length === 0) return res.status(404).json({ message: 'File not found' });
+    res.set('Content-Type', files[0].contentType || 'application/octet-stream');
+    gridFSBucket.openDownloadStream(id).pipe(res);
+  } catch (e) {
+    res.status(400).json({ message: e.message });
   }
 });
 
@@ -149,8 +209,15 @@ router.delete("/:id", protect, async (req, res) => {
       return res.status(403).json({ message: "Not allowed" });
     }
     
-    // Remove the file from uploads directory
-    if (doc.fileName) {
+    // Try to remove from GridFS first if present
+    if (doc.fileId && gridFSBucket) {
+      try {
+        await gridFSBucket.delete(new mongoose.Types.ObjectId(doc.fileId));
+      } catch (e) {
+        console.warn('GridFS delete failed:', e.message);
+      }
+    } else if (doc.fileName) {
+      // Remove from local uploads folder
       const filePath = path.join(process.cwd(), 'uploads', doc.fileName);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);

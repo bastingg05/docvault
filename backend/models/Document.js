@@ -6,6 +6,8 @@ const documentSchema = new mongoose.Schema({
   category: { type: String, required: true },
   expiryDate: { type: Date, required: true },
   fileUrl: { type: String, required: true },
+  // GridFS file id when stored in MongoDB (preferred for Render)
+  fileId: { type: mongoose.Schema.Types.ObjectId, required: false },
   fileName: { type: String, required: true },
   fileSize: { type: Number, required: true },
   fileType: { type: String, required: true },
