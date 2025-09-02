@@ -1,3 +1,5 @@
+import { getApiUrl } from '../config.js';
+
 class HealthService {
   constructor() {
     this.healthCheckInterval = 30000; // 30 seconds
@@ -89,7 +91,7 @@ class HealthService {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
         
-        const healthResponse = await fetch('https://docvault-1.onrender.com/health', {
+        const healthResponse = await fetch(getApiUrl('/health'), {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -248,7 +250,7 @@ class HealthService {
   // Enhanced heartbeat with retry logic
   async sendHeartbeat() {
     try {
-      const response = await fetch('https://docvault-1.onrender.com/api/heartbeat', {
+      const response = await fetch(getApiUrl('/api/heartbeat'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

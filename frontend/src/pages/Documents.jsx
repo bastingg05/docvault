@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import API from '../api';
+import { getApiUrl } from '../config.js';
 
 const Documents = ({ user }) => {
   const [documents, setDocuments] = useState([]);
@@ -149,7 +150,7 @@ const Documents = ({ user }) => {
                 <div className="document-actions">
                   <button 
                     className="action-btn view-btn"
-                    onClick={() => window.open(`/uploads/${document.fileName}`, '_blank')}
+                    onClick={() => window.open(getApiUrl(`/uploads/${document.fileName}`), '_blank')}
                   >
                     <span className="btn-icon">👁️</span>
                     <span className="btn-text">View</span>
