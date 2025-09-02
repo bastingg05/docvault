@@ -169,15 +169,27 @@ const Documents = ({ user }) => {
                         }
                         if (!path.startsWith('/')) path = `/${path}`;
 
-                        const response = await API.get(path, {
-                          responseType: 'blob',
-                          headers: token ? { Authorization: `Bearer ${token}` } : {}
-                        });
+                        const fetchBlob = async () => {
+                          const response = await API.get(path, {
+                            responseType: 'blob',
+                            timeout: 45000,
+                            headers: token ? { Authorization: `Bearer ${token}` } : {}
+                          });
+                          return response;
+                        };
+
+                        let response;
+                        try {
+                          response = await fetchBlob();
+                        } catch (e1) {
+                          // brief backoff then one retry (handles cold starts)
+                          await new Promise(r => setTimeout(r, 1500));
+                          response = await fetchBlob();
+                        }
 
                         const blob = new Blob([response.data], { type: response.headers['content-type'] || 'application/octet-stream' });
                         const fileURL = window.URL.createObjectURL(blob);
                         window.open(fileURL, '_blank', 'noopener,noreferrer');
-                        // Optional: revoke later
                         setTimeout(() => URL.revokeObjectURL(fileURL), 60_000);
                       } catch (err) {
                         console.error('View failed:', err);
