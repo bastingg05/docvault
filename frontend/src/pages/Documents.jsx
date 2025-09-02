@@ -150,7 +150,11 @@ const Documents = ({ user }) => {
                 <div className="document-actions">
                   <button 
                     className="action-btn view-btn"
-                    onClick={() => window.open(getApiUrl(`/uploads/${document.fileName}`), '_blank')}
+                    onClick={() => {
+                      const path = document.fileUrl || `/uploads/${document.fileName}`;
+                      const normalized = path.startsWith('/') ? path : `/${path}`;
+                      window.open(getApiUrl(normalized), '_blank', 'noopener,noreferrer');
+                    }}
                   >
                     <span className="btn-icon">👁️</span>
                     <span className="btn-text">View</span>
