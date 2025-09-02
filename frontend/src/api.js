@@ -23,6 +23,13 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // If sending FormData, let the browser set the correct multipart boundary
+    if (config.data instanceof FormData) {
+      if (config.headers && config.headers['Content-Type']) {
+        delete config.headers['Content-Type'];
+      }
+    }
+
     // Add retry attempt counter
     config.retryAttempt = config.retryAttempt || 0;
     
