@@ -159,11 +159,17 @@ const Documents = ({ user }) => {
                     onClick={() => {
                       const raw = document.fileUrl || `/uploads/${document.fileName}`;
                       if (!raw) return;
+                      // Append token for protected file route
+                      const token = localStorage.getItem('token');
                       if (raw.startsWith('http://') || raw.startsWith('https://')) {
-                        window.open(raw, '_blank', 'noopener,noreferrer');
+                        const url = new URL(raw);
+                        if (token) url.searchParams.set('token', token);
+                        window.open(url.toString(), '_blank', 'noopener,noreferrer');
                       } else {
                         const normalized = raw.startsWith('/') ? raw : `/${raw}`;
-                        window.open(getApiUrl(normalized), '_blank', 'noopener,noreferrer');
+                        const base = new URL(getApiUrl(normalized));
+                        if (token) base.searchParams.set('token', token);
+                        window.open(base.toString(), '_blank', 'noopener,noreferrer');
                       }
                     }}
                   >
