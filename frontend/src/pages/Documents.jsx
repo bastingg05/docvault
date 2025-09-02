@@ -156,20 +156,33 @@ const Documents = ({ user }) => {
                 <div className="document-actions">
                   <button 
                     className="action-btn view-btn"
-                    onClick={() => {
-                      const raw = document.fileUrl || `/uploads/${document.fileName}`;
-                      if (!raw) return;
-                      // Append token for protected file route
-                      const token = localStorage.getItem('token');
-                      if (raw.startsWith('http://') || raw.startsWith('https://')) {
-                        const url = new URL(raw);
-                        if (token) url.searchParams.set('token', token);
-                        window.open(url.toString(), '_blank', 'noopener,noreferrer');
-                      } else {
-                        const normalized = raw.startsWith('/') ? raw : `/${raw}`;
-                        const base = new URL(getApiUrl(normalized));
-                        if (token) base.searchParams.set('token', token);
-                        window.open(base.toString(), '_blank', 'noopener,noreferrer');
+                    onClick={async () => {
+                      try {
+                        const raw = document.fileUrl || `/uploads/${document.fileName}`;
+                        if (!raw) return;
+                        const token = localStorage.getItem('token');
+                        // Build relative API path
+                        let path = raw;
+                        if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                          const urlObj = new URL(raw);
+                          path = urlObj.pathname + (urlObj.search || '');
+                        }
+                        if (!path.startsWith('/')) path = `/${path}`;
+
+                        const response = await API.get(path, {
+                          responseType: 'blob',
+                          headers: token ? { Authorization: `Bearer ${token}` } : {}
+                        });
+
+                        const blob = new Blob([response.data], { type: response.headers['content-type'] || 'application/octet-stream' });
+                        const fileURL = window.URL.createObjectURL(blob);
+                        window.open(fileURL, '_blank', 'noopener,noreferrer');
+                        // Optional: revoke later
+                        setTimeout(() => URL.revokeObjectURL(fileURL), 60_000);
+                      } catch (err) {
+                        console.error('View failed:', err);
+                        const msg = err?.response?.data?.message || err.message || 'Unable to open file';
+                        alert(`Unable to open file: ${msg}`);
                       }
                     }}
                   >
