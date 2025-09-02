@@ -36,14 +36,20 @@ const Documents = ({ user }) => {
 
     try {
       const token = localStorage.getItem('token');
-      await API.delete(`/api/documents/${documentId}`, {
+      const res = await API.delete(`/api/documents/${documentId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      setDocuments(documents.filter(doc => doc._id !== documentId));
+      if (res.status === 200) {
+        setDocuments(prev => prev.filter(doc => doc._id !== documentId));
+      } else {
+        alert('Failed to delete document.');
+      }
     } catch (error) {
       console.error('Error deleting document:', error);
+      const msg = error?.response?.data?.message || error.message || 'Delete failed';
+      alert(`Delete failed: ${msg}`);
     }
   };
 
@@ -151,9 +157,14 @@ const Documents = ({ user }) => {
                   <button 
                     className="action-btn view-btn"
                     onClick={() => {
-                      const path = document.fileUrl || `/uploads/${document.fileName}`;
-                      const normalized = path.startsWith('/') ? path : `/${path}`;
-                      window.open(getApiUrl(normalized), '_blank', 'noopener,noreferrer');
+                      const raw = document.fileUrl || `/uploads/${document.fileName}`;
+                      if (!raw) return;
+                      if (raw.startsWith('http://') || raw.startsWith('https://')) {
+                        window.open(raw, '_blank', 'noopener,noreferrer');
+                      } else {
+                        const normalized = raw.startsWith('/') ? raw : `/${raw}`;
+                        window.open(getApiUrl(normalized), '_blank', 'noopener,noreferrer');
+                      }
                     }}
                   >
                     <span className="btn-icon">👁️</span>
